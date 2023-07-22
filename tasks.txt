@@ -1,0 +1,21 @@
+Prcoess:
+eventbridge -> python/lambda ingestion function -> s3 bucket (ingested data) -> python/lambda trasformation function -> s3 buckets (processed data) -> python/lambda check processed data bucket and update data warehouse
+
+Deployment:
+* yml for demployment on github
+
+Terraform:
+* 2x s3 buckets - ingested data and processed data
+* 3x lambdas - check for changes in database and ingest
+* 3x cloudwatch for lambda - alert in all cases sent to e-mail
+* eventbridge - check for changes < 30 mins
+
+Python:
+* ingestion lambda - query db for changes (CDC?)
+* transform data - into parquet format. How does it know when data is in the ingested data s3? Does it periodically check? What happens to the ingested s3 data? is it deleted? Could we have ingetion lambda send a message or have some alert system?
+* update warehouse - similar to above (transform data), how do we handle that
+
+SQL:
+* What form is the DB in and when do we transform the data - presumably the ingestion function reads and transforms the data? Do we just get the deltas (ie changes), I presume some
+* Queries for the AWS Quicksight dashboard, presumably from data warehouse, which should be in STAR schema? 
+* Do we pre-populate this or should the lambda/s3 handle moving creating the whole data warehouse from the database

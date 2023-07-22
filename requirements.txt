@@ -3,3 +3,5 @@ botocore==1.31.9
 coverage=7.3.11
 pytest=7.4.0
 flake8=6.0.0
+safety=2.3.5
+bandit=1.7.5
