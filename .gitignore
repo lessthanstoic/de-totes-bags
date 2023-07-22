@@ -1,0 +1,9 @@
+**/.DS_Store
+temp/
+.DS_Store
+**/.vscode/
+**/*_cache
+**/*pycache
+*coverage*
+*.zip
+.terraform*
