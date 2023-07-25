@@ -1,14 +1,17 @@
 resource "aws_s3_bucket" "ingested_data_bucket" {
-    bucket="ingested_data_vox_indicium"
+    bucket="ingested-data-vox-indicium"
 }
 
-resource "aws_iam_policy" "ingested_data_policy" {
-  name="ingested_data_policy"
+resource "aws_s3_bucket_policy" "ingested_data_policy" {
+  bucket=aws_s3_bucket.ingested_data_bucket.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Principal": {
+        "AWS": "arn:aws:iam::170940005209:root"
+      },
       "Action": [
         "s3:*"
       ],
@@ -18,10 +21,29 @@ resource "aws_iam_policy" "ingested_data_policy" {
   ]
 }
 EOF
-
 }
 
+resource "aws_s3_bucket" "processed_data_bucket" {
+    bucket="processed-data-vox-indicium"
+}
 
-resource "aws_iam_user" "ingested_data_user" {
-    name="ingested_data_user"
+resource "aws_s3_bucket_policy" "processed_data_policy" {
+  bucket=aws_s3_bucket.processed_data_bucket.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Principal": {
+        "AWS": "arn:aws:iam::170940005209:root"
+      },
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_s3_bucket.processed_data_bucket.arn}/*"
+    }
+  ]
+}
+EOF
 }
