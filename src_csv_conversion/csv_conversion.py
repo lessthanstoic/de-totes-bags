@@ -1,15 +1,13 @@
 import psycopg2
 import csv
 import re
-
-#from python.secrets_manager.retrieve_secrets import retrieve_secrets
-
-from ..python.secrets_manager.retrieve_secrets import retrieve_secrets
+import boto3
 
 
 
-#
+client = boto3.client("secretsmanager")
 
+print(client.list_secrets())
 
 
 
@@ -37,7 +35,7 @@ except psycopg2.Error as e:
 cursor = connection.cursor()
 
 
-# SQL query to fetch all records from a table (replace 'your_table_name' with the actual table name)
+# SQL query to fetch all records from a table 
 query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
 
 # Execute the query
@@ -47,37 +45,18 @@ cursor.execute(query)
 table_list = cursor.fetchall()
 
 
-# Print the results
-
-#print(table_list)
-
-x = -1
-
 for table_items in table_list:
-    x += 1
-    
-
-
-    #print(table_items)
 
     string_item = str(table_items)
 
     string_item = re.sub(r"[,()']", "", string_item)
-  #  print(string_item)
+
     
     query3 = f"SELECT * FROM {string_item}"
-
-  
-
     query3 = re.sub(r"[,()']", "", query3)
-
-
-
 
     cursor.execute(query3)
     table = cursor.fetchall()
-
-
 
     file_path = f"{string_item}.csv"
    
@@ -88,45 +67,5 @@ for table_items in table_list:
     print(f"CSV file '{file_path}' created successfully.")
 
 
-
-
-
-    #print(table)
-
-
-
-
-
-
-
-
-
-# query2 = "SELECT * FROM currency"
-
-# cursor.execute(query2)
-
-# table_currency = cursor.fetchall()
-
-
-#print(table_currency)
-
-#print(table_currency)
-
-
-# for items in table_currency:
-#     pass
-#    # print(items)
-
-
-# file_path = "output.csv"
-
-# with open(file_path, mode='w', newline='') as file:
-#     writer = csv.writer(file)
-#     writer.writerows(table_currency)
-
-#print(f"CSV file '{file_path}' created successfully.")
-
-
-# Close the cursor and connection
 cursor.close()
 connection.close()
