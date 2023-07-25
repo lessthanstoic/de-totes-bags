@@ -3,7 +3,7 @@
 # lambdas
 #
 
-# Create the policy for the ingestion function
+# Create the policy for the lambda ingestion function to use temp security credentials
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
@@ -17,16 +17,12 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-# add the policy above to to lambda role
+# provides an IAM role for the lambda and attaches the above policy, so it can use the credentials
 resource "aws_iam_role" "iam_for_lambda" {
   name               = "role-${var.ingestion_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-# attach the actual policy to the lambda
-# resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
-#     role = 
-# }
 
 
 ####################################################################################
@@ -34,16 +30,9 @@ resource "aws_iam_role" "iam_for_lambda" {
 # Cloud watch
 #
 
-# cloudwatch policy to attach
+# cloudwatch policy (defines the permissions to be attributed to a role) 
+# which allows the creation and "put" to the logs
 data "aws_iam_policy_document" "cw_document" {
-  statement {
-
-    actions = [ "logs:CreateLogGroup" ]
-
-    resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-    ]
-  }
 
   statement {
 
@@ -55,11 +44,9 @@ data "aws_iam_policy_document" "cw_document" {
   }
 }
 
-##################################################################################
-#
-# eventbridge
-#
-output "eventbridge_rule_arns" {
-  description = "The EventBridge Rule ARNs"
-  value       = module.eventbridge.eventbridge_rule_arns
+# attach the cloudwatch policy created above to the lambda IAM role
+resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
+    role = aws_iam_role.iam_for_lambda.name
+    policy_arn = aws_iam_policy_document.cw_document.arn
 }
+
