@@ -8,3 +8,12 @@ variable "transformation_lambda_name" {
     default = "trans-to-star-schema"
 }
 
+variable "eventbridge_name" {
+    type = string
+    default = "ingestion-eventbridge"
+}
+
+variable "pythonversion" {
+    type = string
+    default = "python3.10"
+}
