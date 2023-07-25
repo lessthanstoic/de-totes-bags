@@ -37,4 +37,3 @@ def delete_secrets():
 
 
 
-print(delete_secrets())

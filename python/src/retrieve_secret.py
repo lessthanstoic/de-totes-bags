@@ -36,3 +36,4 @@ def retrieve_secrets():
             break
     if "secret_arn" not in locals():
         print("This is not a secret")
+#
