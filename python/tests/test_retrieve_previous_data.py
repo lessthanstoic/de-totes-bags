@@ -3,6 +3,7 @@ import pandas as pd
 from moto import mock_s3
 import boto3
 from pprint import pprint
+from pytest import raises
 
 @mock_s3
 def create_mock_s3():
@@ -22,6 +23,12 @@ def test_retrieve_data_reads_a_csv_file_from_bucket_and_converts_to_dataframe():
     result = retrieve_previous_data('example')
 
     expected_result = pd.DataFrame({'user_id': [1, 2, 3, 4], 'name': ['Andrei', 'Michael', 'Mark', 'Simon'], 'password': ['Password123', 'Liverpool654', 'Edward34', '!!QWasd']})
-    pprint(result)
-    pprint(expected_result)
+
     pd.testing.assert_frame_equal(result, expected_result)
+
+@mock_s3
+def test_retrieve_data_error_handling():
+
+    create_mock_s3()
+
+    assert retrieve_previous_data('no_file') == None
