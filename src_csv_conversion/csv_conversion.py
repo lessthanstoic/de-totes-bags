@@ -5,9 +5,8 @@ import os
 
 
 def csv_conversion():
+    global table_list
 
-
-   
     secrets = []
     file_path = 'secrets.txt'
     regex_host = ":"
@@ -16,7 +15,7 @@ def csv_conversion():
     inputs = {}
 
     with open(file_path, 'r') as file:
-        ##should be changed as len(the file's number of lines)
+        # Should be changed as len(the file's number of lines)
         for i in range(5):
             line = file.readline()
             secrets.append(line)
@@ -35,14 +34,11 @@ def csv_conversion():
                 break
         inputs[label] = input_value
 
-
-
     host = inputs["Host"]
     port = inputs["Port"]
     database = inputs["Database"]
     user = inputs["User"]
     password = inputs["Password"]
-
 
     # Connect to the database
     try:
@@ -56,8 +52,7 @@ def csv_conversion():
     # Create a cursor object to execute SQL queries
     cursor = connection.cursor()
 
-
-    # SQL query to fetch all records from a table 
+    # SQL query to fetch all records from a table
     query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
 
     # Execute the query
@@ -66,36 +61,24 @@ def csv_conversion():
     # Fetch all records
     table_list = cursor.fetchall()
 
-
-    #71 to 73 in another function
+    # 71 to 73 in another function
     csv_directory = "csv_files"
     if not os.path.exists(csv_directory):
         os.makedirs(csv_directory)
 
     for table_items in table_list:
-        print(table_items)
-
-        #check the number of table names#
-        #check that the number of table names matches the number of csv files in the csv_files dir
-        #check that the names of those files are the same
-        #possibly go in each file and use the .contains() function
        
 
-
         string_item = str(table_items)
-
         string_item = re.sub(r"[,()']", "", string_item)
 
-        
         query = f"SELECT * FROM {string_item}"
         query = re.sub(r"[,()']", "", query)
 
         cursor.execute(query)
         table = cursor.fetchall()
-        
 
-
-        #90 to 96 in another function
+        # 90 to 96 in another function
         file_path = os.path.join(csv_directory, f"{string_item}.csv")
 
         with open(file_path, mode='w', newline='') as file:
@@ -104,11 +87,8 @@ def csv_conversion():
 
         print(f"CSV file '{file_path}' created successfully.")
 
-
     cursor.close()
     connection.close()
-   # return table
+    # return table
 
 
-
-print(csv_conversion())
