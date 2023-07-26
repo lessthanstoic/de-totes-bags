@@ -1,12 +1,12 @@
 from src.secret_login import (
-    retrieve_login_details
+    retrieve_secret_details
 )
 import boto3
 from moto import mock_secretsmanager
 import os
 import pytest
 from botocore.exceptions import ClientError
-from botocore.exceptions import ParamValidationError
+
 
 @pytest.fixture(scope="function")
 def aws_credentials():
@@ -16,6 +16,7 @@ def aws_credentials():
     os.environ["AWS_SECURITY_TOKEN"] = "testing"
     os.environ["AWS_SESSION_TOKEN"] = "testing"
     os.environ["AWS_DEFAULT_REGION"] = "eu-west-2"
+
 
 @pytest.fixture(scope="session")
 def client():
@@ -29,21 +30,21 @@ def test_retrieve_correct_secret(client):
     secret = str({"username": "jeff", "password": "sdfsdf"})
     client.create_secret(
        Name="one", SecretString=secret
-   )
+    )
     # ACT
-    response = retrieve_login_details("one")
+    response = retrieve_secret_details("one")
     # ASSERT
     assert response['username'] == 'jeff'
     assert response['password'] == 'sdfsdf'
 
 
 @mock_secretsmanager
-def test_retrieve_correct_secret(client):
+def test_raises_client_error(client):
     # ARRANGE
     secret = str({"username": "jeff", "password": "sdfsdf"})
     client.create_secret(
        Name="one", SecretString=secret
-   )
+    )
     # ACT / ASSERT
     with pytest.raises(ClientError):
-        retrieve_login_details("on")
+        retrieve_secret_details("on")

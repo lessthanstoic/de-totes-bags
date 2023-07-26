@@ -6,4 +6,6 @@ flake8==6.0.0
 safety==2.3.5
 bandit==1.7.5
 pandas==2.0.3
-moto==4.1.13 
+moto==4.1.13
+psycopg2==2.9.6
+# For successful installation I had use: pip install psycopg2-binary --no-cache-dir

@@ -66,9 +66,9 @@ security-test:
 	$(call execute_in_env, safety check -r ./requirements.txt)
 	$(call execute_in_env, bandit -lll */*.py *c/*/*.py)
 
-## Run the flake8 code check
+## Run the flake8 code check -- old $(call execute_in_env, flake8  ./src/*/*.py ./test/*/*.py)
 run-flake:
-	$(call execute_in_env, flake8  ./src/*/*.py ./test/*/*.py)
+	$(call execute_in_env, flake8  ./python/*/*.py ./python/*/*.py)
 
 ## Run the unit tests
 unit-test:
