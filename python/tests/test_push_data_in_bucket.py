@@ -1,5 +1,5 @@
-from python.src.push_data_in_bucket import push_data_in_bucket
-from moto import mock_s3
+from python.src.push_data_in_bucket import push_data_in_bucket, log_changes_to_db
+from moto import mock_s3, mock_cloudwatch
 import unittest
 from pprint import pprint
 import boto3
@@ -26,3 +26,15 @@ def test_push_data_in_bucket_function():
 
     assert file_name in result
 
+
+
+@mock_cloudwatch
+def test_log_changes():
+    file_path='python/tests/test_file.csv'
+    file_name='test_file.csv'
+
+
+    no_of_changes = log_changes_to_db(file_path, file_name)
+    expected_changes = 2
+
+    assert no_of_changes == expected_changes
