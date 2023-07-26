@@ -1,5 +1,5 @@
-Prcoess:
-eventbridge -> python/lambda ingestion function -> s3 bucket (ingested data) -> python/lambda trasformation function -> s3 buckets (processed data) -> python/lambda check processed data bucket and update data warehouse
+Process:
+eventbridge -> python/lambda ingestion function -> s3 bucket (ingested data) -> python/lambda transformation function -> s3 buckets (processed data) -> python/lambda check processed data bucket and update data warehouse
 
 Deployment:
 * yml for demployment on github
