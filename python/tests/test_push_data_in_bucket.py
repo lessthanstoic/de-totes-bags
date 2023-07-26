@@ -1,0 +1,28 @@
+from python.src.push_data_in_bucket import push_data_in_bucket
+from moto import mock_s3
+import unittest
+from pprint import pprint
+import boto3
+
+@mock_s3
+def create_s3_mock_bucket():
+    client = boto3.client("s3")
+    client.create_bucket(Bucket="ingested-data-vox-indicium", CreateBucketConfiguration={
+        'LocationConstraint': 'eu-west-2'})
+    
+@mock_s3
+def test_push_data_in_bucket_function():
+
+    create_s3_mock_bucket()
+
+    file_path='python/tests/test_file.csv'
+    file_name='test_file.csv'
+
+    push_data_in_bucket(file_path, file_name)
+
+    client = boto3.client("s3")
+
+    result = client.list_objects(Bucket="ingested-data-vox-indicium")['Contents'][0]['Key']
+
+    assert file_name in result
+
