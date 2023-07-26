@@ -73,6 +73,13 @@ def csv_conversion():
         os.makedirs(csv_directory)
 
     for table_items in table_list:
+        print(table_items)
+
+        #check the number of table names#
+        #check that the number of table names matches the number of csv files in the csv_files dir
+        #check that the names of those files are the same
+        #possibly go in each file and use the .contains() function
+       
 
 
         string_item = str(table_items)
