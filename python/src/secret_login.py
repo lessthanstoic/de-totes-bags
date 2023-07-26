@@ -3,13 +3,11 @@ import json
 import logging
 from botocore.exceptions import ClientError
 
-client = boto3.client("secretsmanager")
-logger = logging.getLogger('MyLogger')
-logger.setLevel(logging.INFO)
 
-def retrieve_login_details():
-
-    secret_name = "Totes-Login-Credentials"
+# Due to testing we have ensured that we pass the secret_name to the function
+# unless there's another way to avoid 
+def retrieve_login_details( secret_name ):
+    # secret_name = "Totes-Login-Credentials"
     region_name = "eu-west-2"
 
     # Create a Secrets Manager client
