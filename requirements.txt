@@ -5,3 +5,5 @@ pytest==7.4.0
 flake8==6.0.0
 safety==2.3.5
 bandit==1.7.5
+pandas==2.0.3
+moto==4.1.13 
