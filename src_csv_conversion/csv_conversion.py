@@ -1,13 +1,24 @@
 import psycopg2
 import csv
 import re
-import boto3
+
+secrets = [] 
+file_path = '../de-totes-bags/secrets.txt'
+try:
+    with open(file_path, 'r') as file:
+        # Step 2: Read the file using read() method
+        # file_contents = file.read()
+        # You can also use readline() to read a single line at a time
+        for i in range(4):
+            line = file.readline()
+            secrets.append(line)
+        print(secrets[0])
 
 
+except FileNotFoundError:
+    print(f"File not found: '{file_path}'")
 
-client = boto3.client("secretsmanager")
-
-print(client.list_secrets())
+# The file will be automatically closed after the 'with' block ends.
 
 
 
@@ -16,10 +27,6 @@ port = 5432
 database = "totesys"
 user = "project_user_1"
 password = "wgvk8E1JvSdZcMvbvXda3dna"
-
-
-
-
 
 
 # Connect to the database
