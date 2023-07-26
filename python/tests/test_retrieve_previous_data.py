@@ -31,4 +31,27 @@ def test_retrieve_data_error_handling():
 
     create_mock_s3()
 
-    assert retrieve_previous_data('no_file') == None
+    with raises(ValueError, match="The file no_file does not exist"): 
+        retrieve_previous_data('no_file')
+
+@mock_s3
+def test_retrieve_data_error_handling_with_empty_string():
+
+    create_mock_s3()
+
+    with raises(ValueError, match="No input name"): 
+        retrieve_previous_data('')
+
+@mock_s3
+def test_retrieve_data_error_handling_with_wrong_input():
+
+    create_mock_s3()
+
+    with raises(TypeError, match="Function must take a string input"): 
+        retrieve_previous_data(4875684)
+    
+    with raises(TypeError, match="Function must take a string input"): 
+        retrieve_previous_data(True)
+
+    with raises(TypeError, match="Function must take a string input"): 
+        retrieve_previous_data(['test', 233, 'test'])
