@@ -1,6 +1,4 @@
-from src.secret_login import (
-    retrieve_secret_details
-)
+from src.secret_login import retrieve_secret_details
 import boto3
 from moto import mock_secretsmanager
 import os
@@ -33,7 +31,6 @@ def test_retrieve_correct_secret(client):
     )
     # ACT
     response = retrieve_secret_details("one")
-    # ASSERT
     assert response['username'] == 'jeff'
     assert response['password'] == 'sdfsdf'
 

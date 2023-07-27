@@ -1,7 +1,6 @@
 from src.secret_login import retrieve_secret_details
-from src.parameter_store import (
-    save_to_parameter_store,
-    load_from_parameter_store)
+from src.s3_timestamp import get_s3_timestamp
+from src.csv_write import write_table_to_csv
 import psycopg2
 import re
 
@@ -14,9 +13,9 @@ DBNAME = "totesys"
 
 def postgres_data_capture():
 
-    param_store = "postgres-datetime"
+    param_store = "postgres-datetime.txt"
     try:
-        old_datetime = load_from_parameter_store(param_store)
+        old_datetime = get_s3_timestamp(param_store)
     except Exception as e:
         # log the error
         raise e  # want to stop the program right now
@@ -75,17 +74,23 @@ def postgres_data_capture():
 
         cursor.execute(table_query)
         table = cursor.fetchall()
+        print(table)
 
-        # write_csv_to_local(table)
-        # transfer_csv_to_s3(table)
-        # call function write table as csv to s3 bucket
+        write_table_to_csv(table)
+        # push_data_in_bucket(filepath, tablename)
 
     # Close connections
     cursor.close()
     connection.close()
 
+    with open(param_store, 'w') as f:
+        f.write(current_datetime)
+
     try:
-        save_to_parameter_store(param_store, current_datetime)
+        push_data_in_bucket(param_store, param_store)
     except Exception as e:
         # log the error
         raise e  # want to stop the program right now
+
+
+postgres_data_capture()
