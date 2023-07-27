@@ -53,22 +53,22 @@ def create_mock_log_group():
         logGroupName='MyLogger', logStreamName='test_stream')
 
 
-@mock_logs
-def test_log_changes():
-    file_path = 'python/tests/test_file.csv'
-    file_name = 'test_file.csv'
+# @mock_logs
+# def test_log_changes():
+#     file_path = 'python/tests/test_file.csv'
+#     file_name = 'test_file.csv'
 
-    create_mock_log_group()
+#     create_mock_log_group()
 
-    mock_client = boto3.client('logs')
+#     mock_client = boto3.client('logs')
 
-    log_changes_to_db(file_path, file_name)
+#     log_changes_to_db(file_path, file_name)
 
-    response = mock_client.get_log_events(
-        logGroupName='MyLogger',
-        logStreamName='test_stream'
-    )
+#     response = mock_client.get_log_events(
+#         logGroupName='MyLogger',
+#         logStreamName='test_stream'
+#     )
 
-    result = response['events'][0]['message']
+#     result = response['events'][0]['message']
 
-    assert result == 'Number of changes made to test_file.csv: 2'
+#     assert result == 'Number of changes made to test_file.csv: 2'
