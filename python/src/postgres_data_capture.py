@@ -92,3 +92,5 @@ def postgres_data_capture():
         # log the error
         raise e  # want to stop the program right now
 
+
+postgres_data_capture()
