@@ -6,6 +6,7 @@ import psycopg2
 import re
 
 
+# To maybe place in a secret later
 ENDPOINT = '''nc-data-eng-totesys-production.
 chpsczt8h1nu.eu-west-2.rds.amazonaws.com'''
 PORT = 5432
@@ -78,7 +79,7 @@ def postgres_data_capture():
         print(table)
 
         write_table_to_csv(table)
-        # push_data_in_bucket(filepath, tablename)
+        push_data_in_bucket("./csv_files/", tablename)
 
     # Close connections
     cursor.close()
@@ -92,6 +93,3 @@ def postgres_data_capture():
     except Exception as e:
         # log the error
         raise e  # want to stop the program right now
-
-
-postgres_data_capture()
