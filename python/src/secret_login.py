@@ -3,16 +3,14 @@ import json
 from botocore.exceptions import ClientError
 
 
-# Create a Secrets Manager client
-region_name = "eu-west-2"
-session = boto3.session.Session()
-client = session.client(
-    service_name='secretsmanager',
-    region_name=region_name
-)
-
-
 def retrieve_secret_details(secret_name):
+    # Create a Secrets Manager client
+    region_name = "eu-west-2"
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
 
     try:
         get_secret_value_response = client.get_secret_value(
