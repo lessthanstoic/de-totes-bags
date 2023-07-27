@@ -1,9 +1,9 @@
-from src.secret_login import retrieve_secret_details
+# from src.secret_login import retrieve_secret_details
 import boto3
-from moto import mock_secretsmanager
+# from moto import mock_secretsmanager
 import os
 import pytest
-from botocore.exceptions import ClientError
+# from botocore.exceptions import ClientError
 
 
 @pytest.fixture(scope="function")
