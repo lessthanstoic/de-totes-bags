@@ -7,14 +7,15 @@ import time
 def push_data_in_bucket(file_path, file_name):
 
     try:
-
+        log_changes_to_db(file_path, file_name)
         client = boto3.client("s3")
 
         client.upload_file(file_path, "ingested-data-vox-indicium", file_name)
 
         print(f"The file {file_name} was uploaded")
 
-    except Exception as e:
+    except FileNotFoundError as e:
+        print(f'File {file_path} not found')
         raise e
 
 

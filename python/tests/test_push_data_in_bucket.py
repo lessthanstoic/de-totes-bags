@@ -3,6 +3,7 @@ from python.src.push_data_in_bucket import log_changes_to_db
 from moto import mock_s3, mock_logs
 from pprint import pprint
 import boto3
+from pytest import raises
 
 
 @mock_s3
@@ -29,6 +30,31 @@ def test_push_data_in_bucket_function():
         Bucket="ingested-data-vox-indicium")['Contents'][0]['Key']
 
     assert file_name in result
+    
+
+@mock_s3
+def test_error_handling_for_if_file_path_is_invalid():
+
+    create_s3_mock_bucket()
+
+    file_path = 'python/test_file.csv'
+    file_name = 'test_file.csv'
+    
+    with raises(FileNotFoundError):
+        push_data_in_bucket(file_path, file_name)
+
+
+@mock_s3
+def test_error_handling_for_if_file_name_is_invalid():
+
+    create_s3_mock_bucket()
+
+    file_path = 'python/tests/test_file.csv'
+    file_name = 'test_file.csv'
+
+    
+    with raises(FileNotFoundError):
+        push_data_in_bucket(file_path, file_name)
 
 
 @mock_logs
