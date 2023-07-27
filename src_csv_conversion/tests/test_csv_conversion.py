@@ -4,8 +4,7 @@ import re
 from src_csv_conversion import csv_conversion as cc
 
 
-# Checks to see if the csv_files directory is created
-def test_csv_conversion1():
+def test_checks_if_csv_file_directory_has_been_created():
     csv_conversion()
 
     expected = True
@@ -14,8 +13,7 @@ def test_csv_conversion1():
     assert result == expected
 
 
-# Checks to see if number of the files in csv_files matches the number of tables
-def test_csv_conversion2():
+def test_checks_if_the_number_of_files_in_the_csv_files_matches_the_number_of_tables():
     csv_conversion()
 
     directory_path = "csv_files"
