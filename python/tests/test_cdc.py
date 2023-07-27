@@ -1,4 +1,4 @@
-from src.secret_login import retrieve_secret_details
+from python.src.secret_login import retrieve_secret_details
 import boto3
 from moto import mock_secretsmanager
 import os

@@ -1,7 +1,6 @@
 from python.src.push_data_in_bucket import push_data_in_bucket
 from python.src.push_data_in_bucket import log_changes_to_db
 from moto import mock_s3, mock_logs
-from pprint import pprint
 import boto3
 from pytest import raises
 
@@ -19,7 +18,7 @@ def test_push_data_in_bucket_function():
 
     create_s3_mock_bucket()
 
-    file_path = 'python/tests/test_file.csv'
+    file_path = 'python/tests/'
     file_name = 'test_file.csv'
 
     push_data_in_bucket(file_path, file_name)
@@ -37,7 +36,7 @@ def test_error_handling_for_if_file_path_is_invalid():
 
     create_s3_mock_bucket()
 
-    file_path = 'python/test_file.csv'
+    file_path = 'python/'
     file_name = 'test_file.csv'
 
     with raises(FileNotFoundError):
@@ -69,8 +68,6 @@ def test_log_changes():
         logGroupName='MyLogger',
         logStreamName='test_stream'
     )
-
-    pprint(response)
 
     result = response['events'][0]['message']
 
