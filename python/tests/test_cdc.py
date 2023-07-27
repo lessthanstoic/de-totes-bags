@@ -1,4 +1,3 @@
-from python.src.secret_login import retrieve_secret_details
 import boto3
 from moto import mock_secretsmanager
 import os
@@ -24,6 +23,8 @@ def client():
 
 @mock_secretsmanager
 def test_retrieve_correct_secret(client):
+    from python.src.secret_login import retrieve_secret_details
+
     # ARRANGE
     secret = str({"username": "jeff", "password": "sdfsdf"})
     client.create_secret(
@@ -37,6 +38,8 @@ def test_retrieve_correct_secret(client):
 
 @mock_secretsmanager
 def test_raises_client_error(client):
+    from python.src.secret_login import retrieve_secret_details
+
     # ARRANGE
     secret = str({"username": "jeff", "password": "sdfsdf"})
     client.create_secret(
