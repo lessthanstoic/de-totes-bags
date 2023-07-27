@@ -1,13 +1,13 @@
-from src.retrieve_previous_data import retrieve_previous_data
+from src.s3_timestamp import get_s3_timestamp
 import pandas as pd
 from moto import mock_s3
 import boto3
-from pprint import pprint
 from pytest import raises
 
 
 @mock_s3
 def create_mock_s3():
+    # '1901-01-01 01:01:01.001'
     mock_client = boto3.client('s3')
     mock_client.create_bucket(Bucket='ingested-data-vox-indicium', CreateBucketConfiguration={
         'LocationConstraint': 'eu-west-2',
