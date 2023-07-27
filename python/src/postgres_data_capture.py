@@ -1,6 +1,7 @@
 from src.secret_login import retrieve_secret_details
 from src.s3_timestamp import get_s3_timestamp
 from src.csv_write import write_table_to_csv
+from src.push_data_in_bucket import push_data_in_bucket
 import psycopg2
 import re
 
