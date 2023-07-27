@@ -1,29 +1,35 @@
-from python.src.push_data_in_bucket import push_data_in_bucket, log_changes_to_db
+from python.src.push_data_in_bucket import push_data_in_bucket
+from python.src.push_data_in_bucket import log_changes_to_db
 from moto import mock_s3, mock_logs
 from pprint import pprint
 import boto3
 
+
 @mock_s3
 def create_s3_mock_bucket():
     client = boto3.client("s3")
-    client.create_bucket(Bucket="ingested-data-vox-indicium", CreateBucketConfiguration={
-        'LocationConstraint': 'eu-west-2'})
-    
+    client.create_bucket(Bucket="ingested-data-vox-indicium",
+                         CreateBucketConfiguration={
+                             'LocationConstraint': 'eu-west-2'})
+
+
 @mock_s3
 def test_push_data_in_bucket_function():
 
     create_s3_mock_bucket()
 
-    file_path='python/tests/test_file.csv'
-    file_name='test_file.csv'
+    file_path = 'python/tests/test_file.csv'
+    file_name = 'test_file.csv'
 
     push_data_in_bucket(file_path, file_name)
 
     client = boto3.client("s3")
 
-    result = client.list_objects(Bucket="ingested-data-vox-indicium")['Contents'][0]['Key']
+    result = client.list_objects(
+        Bucket="ingested-data-vox-indicium")['Contents'][0]['Key']
 
     assert file_name in result
+
 
 @mock_logs
 def create_mock_log_group():
@@ -31,12 +37,14 @@ def create_mock_log_group():
     mock_client.create_log_group(
         logGroupName='MyLogger'
     )
-    mock_client.create_log_stream(logGroupName='MyLogger', logStreamName='test_stream')
+    mock_client.create_log_stream(
+        logGroupName='MyLogger', logStreamName='test_stream')
+
 
 @mock_logs
 def test_log_changes():
-    file_path='python/tests/test_file.csv'
-    file_name='test_file.csv'
+    file_path = 'python/tests/test_file.csv'
+    file_name = 'test_file.csv'
 
     create_mock_log_group()
 
@@ -45,10 +53,12 @@ def test_log_changes():
     log_changes_to_db(file_path, file_name)
 
     response = mock_client.get_log_events(
-    logGroupName='MyLogger',
-     logStreamName='test_stream'
+        logGroupName='MyLogger',
+        logStreamName='test_stream'
     )
 
     pprint(response)
 
-    assert response['events'][0]['message'] == 'Number of changes made to test_file.csv: 2'
+    result = response['events'][0]['message']
+
+    assert result == 'Number of changes made to test_file.csv: 2'
