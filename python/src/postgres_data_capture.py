@@ -75,6 +75,7 @@ def postgres_data_capture():
 
         cursor.execute(table_query)
         table = cursor.fetchall()
+        print(table)
 
         # write_csv_to_local(table)
         # transfer_csv_to_s3(table)
@@ -89,3 +90,6 @@ def postgres_data_capture():
     except Exception as e:
         # log the error
         raise e  # want to stop the program right now
+
+
+postgres_data_capture()

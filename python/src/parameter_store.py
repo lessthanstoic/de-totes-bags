@@ -21,7 +21,7 @@ def load_from_parameter_store(parameter_name):
         # but then we'd need to initialise another connection
         # to the boto3.client('ssm') so we're returning here -
         # - though this makes it not pep8 compliant
-        return '1901-01-01'
+        return '1901-01-01 01:01:01.001'
         ep
     except Exception as e:
         raise e

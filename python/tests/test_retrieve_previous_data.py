@@ -1,9 +1,10 @@
-from python.src.retrieve_previous_data import retrieve_previous_data
+from src.retrieve_previous_data import retrieve_previous_data
 import pandas as pd
 from moto import mock_s3
 import boto3
 from pprint import pprint
 from pytest import raises
+
 
 @mock_s3
 def create_mock_s3():
