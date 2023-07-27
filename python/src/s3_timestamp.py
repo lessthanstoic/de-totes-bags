@@ -12,10 +12,8 @@ def get_s3_timestamp(filename):
 
         #get the object with the input name
         file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=filename)
-
-        f = open(file, "r")
-        
-        return f
+        timestamp = file['Body'].read()
+        return timestamp.decode('utf-8')
     
     except ClientError as e:
         #catches the error if the user tap a non-existent table name
