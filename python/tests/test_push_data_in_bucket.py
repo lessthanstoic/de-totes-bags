@@ -1,6 +1,5 @@
 from python.src.push_data_in_bucket import push_data_in_bucket, log_changes_to_db
-from moto import mock_s3, mock_cloudwatch
-import unittest
+from moto import mock_s3, mock_logs
 from pprint import pprint
 import boto3
 
@@ -26,15 +25,30 @@ def test_push_data_in_bucket_function():
 
     assert file_name in result
 
+@mock_logs
+def create_mock_log_group():
+    mock_client = boto3.client('logs')
+    mock_client.create_log_group(
+        logGroupName='MyLogger'
+    )
+    mock_client.create_log_stream(logGroupName='MyLogger', logStreamName='test_stream')
 
-
-@mock_cloudwatch
+@mock_logs
 def test_log_changes():
     file_path='python/tests/test_file.csv'
     file_name='test_file.csv'
 
+    create_mock_log_group()
 
-    no_of_changes = log_changes_to_db(file_path, file_name)
-    expected_changes = 2
+    mock_client = boto3.client('logs')
 
-    assert no_of_changes == expected_changes
+    log_changes_to_db(file_path, file_name)
+
+    response = mock_client.get_log_events(
+    logGroupName='MyLogger',
+     logStreamName='test_stream'
+    )
+
+    pprint(response)
+
+    assert response['events'][0]['message'] == 'Number of changes made to test_file.csv: 2'
