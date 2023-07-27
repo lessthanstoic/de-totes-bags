@@ -56,7 +56,7 @@ def test_exception_from_ssm():
 
 
 @mock_ssm
-def test_paramnotfound_exception_from_ssm():
+def test_paramnotfound_returns_default_date():
     # ARRANGE
     ssm = boto3.client('ssm')
     ssm.put_parameter(
@@ -64,5 +64,6 @@ def test_paramnotfound_exception_from_ssm():
         Value="bar",
         Type="String",
     )
-    with pytest.raises(ssm.exceptions.ParameterNotFound):
-        load_from_parameter_store('fo')
+    # with pytest.raises(ssm.exceptions.ParameterNotFound):
+    #     load_from_parameter_store('fo')
+    assert load_from_parameter_store('fo') == '1901-01-01 01:01:01.001'
