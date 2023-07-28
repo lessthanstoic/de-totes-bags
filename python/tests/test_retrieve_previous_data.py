@@ -56,3 +56,4 @@ def test_retrieve_data_error_handling_with_wrong_input():
 
     with raises(TypeError, match="Function must take a string input"): 
         retrieve_previous_data(['test', 233, 'test'])
+
