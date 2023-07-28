@@ -23,7 +23,7 @@ def postgres_data_capture(event, context):
         raise e  # want to stop the program right now
 
     try:
-        db_login_deets = retrieve_secret_details("Totes-Login-Credentials")
+        db_login_deets = retrieve_secret_details("Totesys-Access")
     except Exception as e:
         # log the error
         raise e  # want to stop the program right now

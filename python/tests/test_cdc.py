@@ -62,7 +62,6 @@ def test_retrieves_correct_secret():
 
     answer = retrieve_secret_details('test_secret')
 
-
     assert answer == {'password': 'test_password', 'username': 'test_user'}
 
 
@@ -76,13 +75,15 @@ def test_raises_client_error():
 
     pass
 
+
 """
-ISSUE IDENTIFIED - In testing, secrets have quote marks surrounding their values
-    This allows them to be converted to json format.
-    
-    Our actual secret does NOT have quote marks around the values. This causes an error
-    when we attempt to convert the secret values data into a json format
-    
-    POSSIBLE SOLUTIONS:
-    - alter function to break SecretString down into pieces and add quote marks manually
-    - change the secret value so that it is in json format"""
+ISSUE IDENTIFIED - In testing, secrets have quote marks
+    surrounding their values to convert them to json format.
+
+    Our actual secret didn't have quote marks around the values.
+    This causes an error when we attempt when doing json.loads
+
+    SOLUTION IMPLEMENTED:
+    - created a new secret with a json format that contains all
+    database information called 'Totesys-Access. This allows the
+    removal of hardcoded credentials from data_capture file as well"""
