@@ -21,13 +21,13 @@ def retrieve_secret_details(secret_name):
 
     # Decrypts secret using the associated KMS key.
     secret = get_secret_value_response['SecretString']
-    data = (
-        "{"
-        + secret
-        .replace("{", "")
-        .replace("}", "")
-        .replace("'", '"')
-        + "}"
-    )
-    data_info = json.loads(data)
-    return data_info
+    # data = (
+    #     "{"
+    #     + secret
+    #     .replace("{", "")
+    #     .replace("}", "")
+    #     .replace("'", '"')
+    #     + "}"
+    # )
+    data = json.loads(secret)
+    return data

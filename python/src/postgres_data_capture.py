@@ -30,9 +30,9 @@ def postgres_data_capture(event, context):
 
     try:
         connection = psycopg2.connect(
-            host=ENDPOINT,
-            port=PORT,
-            database=DBNAME,
+            host=db_login_deets['host'],
+            port=int(db_login_deets['port']),
+            database=db_login_deets['database'],
             user=db_login_deets['username'],
             password=db_login_deets['password']
         )
