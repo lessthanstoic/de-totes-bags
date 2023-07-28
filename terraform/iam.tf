@@ -33,6 +33,14 @@ resource "aws_iam_role" "iam_for_lambda" {
 # cloudwatch policy (defines the permissions to be attributed to a role) 
 # which allows the creation and "put" to the logs
 data "aws_iam_policy_document" "cw_document" {
+  statement {
+
+    actions = [ "logs:CreateLogGroup" ]
+
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
 
   statement {
 
