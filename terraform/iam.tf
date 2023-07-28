@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "cw_document" {
     actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
 
     resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.lambda_name}:*"
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.ingestion_lambda_name}:*"
     ]
   }
 }
@@ -47,6 +47,6 @@ data "aws_iam_policy_document" "cw_document" {
 # attach the cloudwatch policy created above to the lambda IAM role
 resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
     role = aws_iam_role.iam_for_lambda.name
-    policy_arn = aws_iam_policy_document.cw_document.arn
+    policy_arn = data.aws_iam_policy_document.cw_document.arn
 }
 
