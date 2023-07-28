@@ -47,6 +47,11 @@ data "aws_iam_policy_document" "cw_document" {
 # attach the cloudwatch policy created above to the lambda IAM role
 resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
     role = aws_iam_role.iam_for_lambda.name
-    policy_arn = data.aws_iam_policy_document.cw_document.arn
+    policy_arn = aws_iam_policy.cw_policy.arn
 }
 
+resource "aws_iam_policy" "cw_policy" {
+  name        = "cloudwatch-log-policy"
+  description = "A policy to give ingestion lambda permissions to log to cloudwatch"
+  policy      = data.aws_iam_policy_document.cw_document.json
+}
