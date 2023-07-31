@@ -1,3 +1,7 @@
+# Bucket 1: Ingested Data
+# Create s3
+# Attach policy
+# Add bucket trigger
 resource "aws_s3_bucket" "ingested_data_bucket" {
     bucket="ingested-data-vox-indicium"
 }
@@ -23,6 +27,18 @@ resource "aws_s3_bucket_policy" "ingested_data_policy" {
 EOF
 }
 
+# resource "aws_s3_bucket_notification" "transform_lambda_trigger" {
+#   bucket = aws_s3_bucket.ingested_data_bucket.id
+#   lambda_function {
+#     lambda_function_arn = aws_lambda_function.data_transform.arn
+#     events = ["s3:ObjectCreated:*"]
+#   }
+# }
+
+# Bucket 2: Transformed Data
+# Create s3
+# Attach policy
+# Add bucket trigger
 resource "aws_s3_bucket" "processed_data_bucket" {
     bucket="processed-data-vox-indicium"
 }
