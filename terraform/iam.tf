@@ -3,6 +3,8 @@
 # lambdas
 #
 
+# Lambda 1: Ingestion Function
+#
 # Create the policy for the lambda ingestion function to use temp security credentials
 data "aws_iam_policy_document" "assume_role" {
   statement {
@@ -23,6 +25,14 @@ resource "aws_iam_role" "iam_for_lambda" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
+
+# Lambda 2: Transformation Function
+#
+# We attached the same role as above
+resource "aws_iam_role" "iam_for_lambda" {
+  name               = "role-${var.transformation_lambda_name}"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
 
 
 ####################################################################################
