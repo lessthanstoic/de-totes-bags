@@ -1,20 +1,17 @@
 """
 This module reads .csv files from our ingestion bucket, and converts them to a pandas data frame.
-This module contains one function:
-sales_order_data_frame
-create_parquet
-main
+This module contains three functions:
+sales_order_data_frame - reads the CSV file and returns a DataFrame.
+create_parquet - converts the DataFrame to a parquet file.
+main - runs both functions to create the final parquet file.
 """
 import boto3
 import pandas as pd
-from botocore.exceptions import ClientError
-from pprint import pprint
-from moto import mock_s3
+import botocore
 import io
 import os
+from botocore.exceptions import ClientError
 
-
-@mock_s3
 def sales_order_data_frame(table_name):
     """
     The function sales_order_data_frame reads a .csv file from our ingestion bucket and manipulate columns name with specific datatype and return a nice data frame.
@@ -28,19 +25,15 @@ def sales_order_data_frame(table_name):
 
     """
     try:
+        # Check for empty input name
         if len(table_name)==0:
             raise ValueError("No input name")
-        file_name = table_name + ".csv"
-        s3 = boto3.client('s3')
-
-        #this line need to be delete 
-        s3.create_bucket(Bucket='ingested-data-vox-indicium', CreateBucketConfiguration={
-           'LocationConstraint': 'eu-west-2',
-        })
         
-        with open('python/src/csv_files/sales_order.csv', 'rb') as data:
-            s3.put_object(Bucket='ingested-data-vox-indicium', Body=data, Key='sales_order.csv')
-        #until 
+        # Define file name
+        file_name = table_name + ".csv"
+        
+        # Connect to S3 client
+        s3 = boto3.client('s3')
 
         file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=file_name)
 
@@ -50,7 +43,7 @@ def sales_order_data_frame(table_name):
                      'units_sold', 'unit_price', 'currency_id', 'agreed_delivery_date','agreed_payment_date',
                       'agreed_delivery_location_id']
         
-        # Use the column names when reading the CSV
+        # Read the CSV file using the column names
         data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')), names=col_names)
 
         # Split the datetime columns into separate date and time columns
@@ -82,52 +75,67 @@ def sales_order_data_frame(table_name):
             'agreed_delivery_location_id': 'int'
         })
         
+        # Return the final DataFrame
         return data_frame
-    
+    except ValueError as e:
+        # Catching the specific ValueError before the generic Exception
+        raise e
     except ClientError as e:
-        #catches the error if the user tap a non-existent table name
+        # Catch the error if the table name is non-existent
         if e.response['Error']['Code'] == 'NoSuchKey':
             raise ValueError(f"The file {table_name} does not exist")
         else:
-            raise
+            raise e
     except TypeError as e:
        #catches the error if the user tap an incorrect input
         raise e
+    except FileNotFoundError:
+        raise FileNotFoundError(f"The file {file_name} does not exist locally")
+    except Exception as e:
+        # Generic exception to catch any other errors
+        raise Exception(f"An unexpected error occurred: {e}")
     
 def create_parquet(data_frame, table_name):
     """
-    The function create_parquet convert the data frame in a parquet format.
+    Convert the DataFrame to a parquet format.
     Arguments:
+    data_frame - represent the DataFrame from the function sales_order_data_frame.
     table_name (string) - represents the name of a table in our database.
-    data_frame - represent the data frame from function sales_order_data_frame.
     """
-
-    # Save DataFrame to a parquet file
-    data_frame.to_parquet(f'{table_name}.parquet', engine='pyarrow')
+    try:
+        # Save DataFrame to a parquet file
+        data_frame.to_parquet(f'{table_name}.parquet', engine='pyarrow')
+    except Exception as e:
+        # Generic exception for unexpected errors during conversion
+        raise Exception(f"An error occurred while converting to parquet: {e}")
 
 def main():
     """
-    The function main run both function to create the final parquet file.    
+    Runs both functions to create the final parquet file.
     Output:
     parquet file
     """
+    try:
+        # Retrieve the data from the S3 bucket
+        table_name = 'sales_order'
+        df = sales_order_data_frame(table_name)
+        parquet_directory = 'parquet_file'
 
-    # Retrieve the data from the S3 bucket
-    table_name = 'sales_order'
-    df = sales_order_data_frame(table_name)
-    parquet_directory = 'parquet_file'
+        # Create directory if it doesn't exist 
+        parquet_directory = "parquet_files"
+        if not os.path.exists(parquet_directory):
+            os.makedirs(parquet_directory)
+        file_path = os.path.join(parquet_directory, f'{table_name}')
+        
+        print(f"Parquet file '{file_path}' created successfully.")
 
-    #need to do something to create this files in a directory 
-    parquet_directory = "parquet_files"
-    if not os.path.exists(parquet_directory):
-        os.makedirs(parquet_directory)
-    file_path = os.path.join(parquet_directory, f'{table_name}')
-       
-    print(f"Parquet file '{file_path}' created successfully.")
+        create_parquet(df, file_path)
 
-    create_parquet(df, file_path)
+    except Exception as e:
+        print(f"An error occurred in the main function: {e}")
 
-    #need to make a function to push this parquet files in the process s3 buck
-    
-main()
+
+
+
+
 
