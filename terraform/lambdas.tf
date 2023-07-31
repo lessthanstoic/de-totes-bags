@@ -3,8 +3,10 @@ resource "aws_lambda_function" "s3_file_reader" {
   filename = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256
   role = aws_iam_role.iam_for_lambda.arn
-  handler = "postgres_data_capture.postgres_data_capture" # pythonfilename.functionname
+  handler = "src/postgres_data_capture.postgres_data_capture" # pythonfilename.functionname
   runtime = var.pythonversion
+  timeout = 60
+  layers = [aws_lambda_layer_version.lambda_layer.arn, "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3"]
   # depends_on = [ aws_cloudwatch_log_group.ingestion_lambda_log ]
 }
 
@@ -20,3 +22,9 @@ resource "aws_lambda_function" "s3_file_reader" {
 #   name = "ingest-sql-totes"
 #   log_group_name = aws_cloudwatch_log_group.ingestion_lambda_log.name
 # }
+
+resource "aws_lambda_layer_version" "lambda_layer" {
+  filename   = "${path.module}/../layers/python.zip"
+  layer_name = "psycopg2"
+  compatible_runtimes = ["python3.10"]
+}
