@@ -13,7 +13,7 @@ PORT = 5432
 DBNAME = "totesys"
 
 
-def postgres_data_capture():
+def postgres_data_capture(event, context):
 
     param_store = "postgres-datetime.txt"
     try:
@@ -62,24 +62,33 @@ def postgres_data_capture():
     table_list = cursor.fetchall()
 
     for table_items in table_list:
-        string_item = str(table_items)
+        table_name = str(table_items)
         # replace "(" or ")" with ""
-        string_item = re.sub(r"[,()']", "", string_item)
+        table_name = re.sub(r"[,()']", "", table_name)
 
         table_query = f'''SELECT *
-        FROM {string_item}
+        FROM {table_name}
         WHERE created_at
         BETWEEN {old_datetime} AND {current_datetime}
         OR last_updated
         BETWEEN {old_datetime} AND {current_datetime};'''
         table_query = re.sub(r"[,()']", "", table_query)
 
-        cursor.execute(table_query)
-        table = cursor.fetchall()
-        print(table)
+        full_table_query = f'''SELECT *
+        FROM {table_name};'''
+        full_table_query = re.sub(r"[,()']", "", full_table_query)
 
-        write_table_to_csv(table)
-        push_data_in_bucket("./csv_files/", tablename)
+        cursor.execute(table_query)
+        table_changes = cursor.fetchall()
+
+        write_table_to_csv(table_changes, f'{table_name}_changes')
+        push_data_in_bucket('./csv_files/', f'{table_name}_changes.csv')
+
+        cursor.execute(full_table_query)
+        full_table = cursor.fetchall()
+
+        write_table_to_csv(full_table, table_name)
+        push_data_in_bucket('./csv_files/', f'{table_name}.csv')
 
     # Close connections
     cursor.close()
@@ -89,7 +98,8 @@ def postgres_data_capture():
         f.write(current_datetime)
 
     try:
-        push_data_in_bucket(param_store, param_store)
+        push_data_in_bucket("./", param_store)
+
     except Exception as e:
         # log the error
         raise e  # want to stop the program right now

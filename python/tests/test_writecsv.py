@@ -1,4 +1,4 @@
-from src.csv_write import write_table_to_csv
+from python.src.csv_write import write_table_to_csv
 import os
 
 

@@ -52,4 +52,3 @@ data "archive_file" "warehouse_lambda" {
     content  = data.template_file.ssh_config.rendered
     filename = ".ssh/config"
   }
-}
