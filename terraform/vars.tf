@@ -57,3 +57,5 @@ variable "pythonversion" {
     type = string
     default = "python3.10"
 }
+
+variable "my_email_alerts" {}
