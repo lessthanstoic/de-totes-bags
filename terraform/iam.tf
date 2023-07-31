@@ -29,11 +29,19 @@ resource "aws_iam_role" "iam_for_lambda" {
 # Lambda 2: Transformation Function
 #
 # We attached the same role as above
-resource "aws_iam_role" "iam_for_lambda" {
+resource "aws_iam_role" "iam_for_transformation_lambda" {
   name               = "role-${var.transformation_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
+
+# Lambda 3: Warehousing Function
+#
+# We attached the same role as above
+resource "aws_iam_role" "iam_for_warehousing_lambda" {
+  name               = "role-${var.warehousing_lambda_name}"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
 
 ####################################################################################
 #
@@ -49,7 +57,9 @@ data "aws_iam_policy_document" "cw_document" {
     actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
 
     resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.lambda_name}:*"
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.ingestion_lambda_name}:*",
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.transformation_lambda_name}:*",
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.warehousing_lambda_name}:*",
     ]
   }
 }
@@ -59,4 +69,17 @@ resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
     role = aws_iam_role.iam_for_lambda.name
     policy_arn = aws_iam_policy_document.cw_document.arn
 }
+
+# attach the cloudwatch policy created above to the lambda IAM role
+resource "aws_iam_role_policy_attachment" "transformation_lambda_cw_policy_attachment" {
+    role = aws_iam_role.iam_for_transformation_lambda.name
+    policy_arn = aws_iam_policy_document.cw_document.arn
+}
+
+# attach the cloudwatch policy created above to the lambda IAM role
+resource "aws_iam_role_policy_attachment" "warehousing_lambda_cw_policy_attachment" {
+    role = aws_iam_role.iam_for_warehousing_lambda.name
+    policy_arn = aws_iam_policy_document.cw_document.arn
+}
+
 

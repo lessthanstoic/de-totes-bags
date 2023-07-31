@@ -11,6 +11,10 @@ variable "transformation_lambda_name" {
     default = "trans-to-star-schema"
 }
 
+variable "warehousing_lambda_name" {
+    type = string
+    default = "parquet-to-data-warehouse"
+}
 
 #############################################
 # eventbridges
@@ -23,6 +27,11 @@ variable "eventbridge_name" {
 variable "cloudwatch_upload" {
     type = string
     default = "upload-eventbridge"
+}
+
+variable "eventbridge_warehouse" {
+    type = string
+    default = "parquet-eventbridge"
 }
 
 
