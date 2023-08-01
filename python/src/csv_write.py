@@ -4,7 +4,7 @@ import csv
 
 def write_table_to_csv(table, tablename):
 
-    csv_directory = "csv_files"
+    csv_directory = "/tmp/csv_files"
     if not os.path.exists(csv_directory):
         os.makedirs(csv_directory)
 

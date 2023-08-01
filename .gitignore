@@ -5,6 +5,7 @@ temp/
 **/*_cache
 **/*pycache
 *coverage*
-*.zip
+# *.zip
 .terraform*
 venv/
+layer_unzipped/

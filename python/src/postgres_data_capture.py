@@ -2,6 +2,7 @@ from src.secret_login import retrieve_secret_details
 from src.s3_timestamp import get_s3_timestamp
 from src.csv_write import write_table_to_csv
 from src.push_data_in_bucket import push_data_in_bucket
+
 import psycopg2
 import re
 
@@ -47,14 +48,16 @@ def postgres_data_capture(event, context):
     cursor = connection.cursor()
 
     # Get current datetime
-    datetime_query = "SELECT NOW();"
+    datetime_query = "SELECT TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI:SS.MS');"
     cursor.execute(datetime_query)
-    current_datetime = cursor.fetchall()
-
+    current_datetime = str(cursor.fetchall())
+    current_datetime = re.sub(r"[,()']", "", current_datetime)
+    
+    
     # SQL query to fetch all records from a table
     query = '''SELECT table_name
     FROM information_schema.tables
-    WHERE table_schema = "public";'''
+    WHERE table_schema = 'public';'''
     # Execute the query
     cursor.execute(query)
 
@@ -64,41 +67,51 @@ def postgres_data_capture(event, context):
     for table_items in table_list:
         table_name = str(table_items)
         # replace "(" or ")" with ""
-        table_name = re.sub(r"[,()']", "", table_name)
+        if table_name != "('_prisma_migrations',)":
+            table_name = re.sub(r"[,()']", "", table_name)
 
-        table_query = f'''SELECT *
-        FROM {table_name}
-        WHERE created_at
-        BETWEEN {old_datetime} AND {current_datetime}
-        OR last_updated
-        BETWEEN {old_datetime} AND {current_datetime};'''
-        table_query = re.sub(r"[,()']", "", table_query)
+            table_query = f'''SELECT *
+            FROM {table_name}
+            WHERE created_at
+            BETWEEN timestamp '{old_datetime}' AND timestamp '{current_datetime}' 
+            OR last_updated
+            BETWEEN timestamp '{old_datetime}' AND timestamp '{current_datetime}';'''
+            # table_query = re.sub(r"[,()']", "", table_query)
 
-        full_table_query = f'''SELECT *
-        FROM {table_name};'''
-        full_table_query = re.sub(r"[,()']", "", full_table_query)
+            full_table_query = f'''SELECT *
+            FROM {table_name};'''
+            # full_table_query = re.sub(r"[,()']", "", full_table_query)
 
-        cursor.execute(table_query)
-        table_changes = cursor.fetchall()
+            cursor.execute(table_query)
+            table_changes = cursor.fetchall()
+            columns = []
+            for col in cursor.description:
+                columns.append(col[0])
+            table_changes.insert(0, tuple(columns))
+            
+            write_table_to_csv(table_changes, f'{table_name}_changes')
+            push_data_in_bucket('/tmp/csv_files/', f'{table_name}_changes.csv')
 
-        write_table_to_csv(table_changes, f'{table_name}_changes')
-        push_data_in_bucket('./csv_files/', f'{table_name}_changes.csv')
+            cursor.execute(full_table_query)
+            full_table = cursor.fetchall()
+            columns = []
+            for col in cursor.description:
+                columns.append(col[0])
+            full_table.insert(0, tuple(columns))
 
-        cursor.execute(full_table_query)
-        full_table = cursor.fetchall()
-
-        write_table_to_csv(full_table, table_name)
-        push_data_in_bucket('./csv_files/', f'{table_name}.csv')
+        
+            write_table_to_csv(full_table, table_name)
+            push_data_in_bucket('/tmp/csv_files/', f'{table_name}.csv')
 
     # Close connections
     cursor.close()
     connection.close()
 
-    with open(param_store, 'w') as f:
+    with open(f'/tmp/csv_files/{param_store}', 'w') as f:
         f.write(current_datetime)
 
     try:
-        push_data_in_bucket("./", param_store)
+        push_data_in_bucket("/tmp/csv_files/", param_store)
 
     except Exception as e:
         # log the error
