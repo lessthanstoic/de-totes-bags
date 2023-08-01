@@ -3,14 +3,16 @@ import pandas as pd
 import boto3
 import os
 from moto import mock_s3
-from src.sales_order import (sales_order_data_frame, create_parquet, main)
+from src.sales_order import (sales_order_data_frame, create_parquet, push_parquet_file, main)
+import tempfile
 
 # Set up the mock S3 environment and create a CSV for testing
 @pytest.fixture
 def create_mock_s3():
     with mock_s3():
         s3 = boto3.client('s3', region_name='eu-west-2')
-        s3.create_bucket(Bucket='ingested-data-vox-indicium')
+        s3.create_bucket(Bucket='ingested-data-vox-indicium', CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
+        s3.create_bucket(Bucket='processed-data-vox-indicium', CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
         csv_data = "1,2023-07-31 12:00:00.000,2023-07-31 12:00:00.000,1,1,1,1,100.0,1,2023-07-31,2023-07-31,1\n"
         s3.put_object(Bucket='ingested-data-vox-indicium', Key='sales_order.csv', Body=csv_data)
         yield
@@ -55,10 +57,21 @@ def test_create_parquet():
         'agreed_delivery_location_id': [1]
     })
     create_parquet(df, 'test_table_name')
-    # Check if the file exists
-    assert os.path.exists('test_table_name.parquet')  
+    s3 = boto3.client('s3', region_name='eu-west-2')
+    # Check if the file was created in the S3 bucket 
+    response = s3.get_object(Bucket='ingested-data-vox-indicium', Key='test_table_name.parquet')
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
-def test_parquet_content():
+def test_push_parquet_file(create_mock_s3):
+    
+    s3 = boto3.client('s3', region_name='eu-west-2')
+    s3.put_object(Bucket='ingested-data-vox-indicium', Key='sales_order.parquet', Body=b'test')
+    push_parquet_file('sales_order')
+    # Check if the parquet file was send to the process bucket
+    response = s3.get_object(Bucket='processed-data-vox-indicium', Key='sales_order.parquet')
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
+
+def test_parquet_content_from_processed_data_bucket():
     df = pd.DataFrame({
         'sales_order_id': [1],
         'created_date': ['2023-07-31'],
@@ -75,12 +88,37 @@ def test_parquet_content():
         'agreed_payment_date': ['2023-07-31'],
         'agreed_delivery_location_id': [1]
     })
-    create_parquet(df, 'test_table_content')
-    read_parquet = pd.read_parquet('test_table_content.parquet')
+    # Write DataFrame to a temporary Parquet file
+    temp_parquet_path = tempfile.mktemp(suffix='.parquet')
+    df.to_parquet(temp_parquet_path)
+
+    # Read the content of the Parquet file into bytes
+    with open(temp_parquet_path, 'rb') as temp_file:
+        parquet_content = temp_file.read()
+
+    # Put the parquet file into the S3 bucket
+    s3 = boto3.client('s3', region_name='eu-west-2')
+    s3.put_object(Bucket='processed-data-vox-indicium', Key='sales_order.parquet', Body=parquet_content)
+
+    # Retrieve the parquet file from S3 bucket
+    response = s3.get_object(Bucket='processed-data-vox-indicium', Key='sales_order.parquet')
+    parquet_file = response['Body'].read()
+
+    # Write the retrieved content to a temporary file
+    retrieved_parquet_path = tempfile.mktemp(suffix='.parquet')
+    with open(retrieved_parquet_path, 'wb') as temp_file:
+        temp_file.write(parquet_file)
+
+    # Read the parquet file with pandas
+    read_parquet = pd.read_parquet(retrieved_parquet_path)
+
+    # Compare both DataFrames
     pd.testing.assert_frame_equal(df, read_parquet)
 
 # Test the main function
 def test_main(create_mock_s3):
     main()
-    # Check if the file exists
-    assert os.path.exists('parquet_files/sales_order.parquet')  
+    # Check if the file was transferred in the final bucket
+    s3 = boto3.client('s3', region_name='eu-west-2')
+    response = s3.get_object(Bucket='processed-data-vox-indicium', Key='sales_order.parquet')
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 200 

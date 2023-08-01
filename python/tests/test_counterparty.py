@@ -83,7 +83,6 @@ import pandas as pd
 import boto3
 from moto import mock_s3
 from src.dim_counterparty import (dim_counterparty_data_frame, create_parquet, push_parquet_file, main)
-import io
 import tempfile
 
 # Set up the mock S3 environment and create a CSV for testing
@@ -189,7 +188,7 @@ def test_parquet_content_in_processed_bucket(create_mock_s3):
 # Test the main function
 def test_main(create_mock_s3):
     main()
-    # Verificăm dacă fișierul a fost transferat în bucket-ul final
+    # Check if the file was transferred in the final bucket
     s3 = boto3.client('s3', region_name='eu-west-2')
     response = s3.get_object(Bucket='processed-data-vox-indicium', Key='counterparty.parquet')
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
