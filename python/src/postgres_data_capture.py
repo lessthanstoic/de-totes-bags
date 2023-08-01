@@ -117,7 +117,7 @@ def postgres_data_capture(event, context):
                 except Exception as e:
                     logger.critical('Query error:', e)
 
-                    full_table = cursor.fetchall()
+                full_table = cursor.fetchall()
                 columns = []
                 for col in cursor.description:
                     columns.append(col[0])
