@@ -84,8 +84,6 @@ import boto3
 from moto import mock_s3
 from src.dim_counterparty import (dim_counterparty_data_frame, create_parquet, push_parquet_file, main)
 
-# Aici "your_module" ar trebui să fie numele modulului în care se află codul tău.
-
 # Set up the mock S3 environment and create a CSV for testing
 @pytest.fixture
 def create_mock_s3():
