@@ -50,7 +50,7 @@ import json
 
 @mock_secretsmanager
 def import_secret_to_mock(secret_id):
-    mock_client = boto3.client('secretsmanager')
+    mock_client = boto3.client('secretsmanager', region_name='eu-west-2')
     mock_client.create_secret(Name=secret_id, SecretString=json.dumps(
         {"username": 'test_user', "password": 'test_password'}))
 
