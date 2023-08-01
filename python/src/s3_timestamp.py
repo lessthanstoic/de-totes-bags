@@ -16,8 +16,10 @@ def get_s3_timestamp(filename):
         return timestamp.decode('utf-8')
     except ClientError as e:
         # catches the error if the user tap a non-existent table name
+        # whole table uploaded in case of missing file
         if e.response['Error']['Code'] == 'NoSuchKey':
             return '1901-01-01 01:01:01.001'
     except TypeError:
         # catches the error if the user tap an incorrect input
+        print(TypeError)
         raise TypeError("Function must take a string input")

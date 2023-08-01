@@ -4,6 +4,13 @@
 # Add bucket trigger
 resource "aws_s3_bucket" "ingested_data_bucket" {
     bucket="ingested-data-vox-indicium"
+    force_destroy = true
+}
+
+resource "aws_s3_object" "timestamp_text" {
+  bucket = aws_s3_bucket.ingested_data_bucket.bucket
+  key = "postgres-datetime.txt"
+  source = "../python/src/postgres-datetime.txt"
 }
 
 resource "aws_s3_bucket_policy" "ingested_data_policy" {

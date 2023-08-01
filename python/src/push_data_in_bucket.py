@@ -1,7 +1,10 @@
 import boto3
 import pandas as pd
-import calendar
-import time
+import logging
+from botocore.exceptions import ClientError
+
+logger = logging.getLogger('MyLogger')
+logger.setLevel(logging.INFO)
 
 
 def push_data_in_bucket(directory, file_name):
@@ -18,7 +21,8 @@ def push_data_in_bucket(directory, file_name):
         print(f"The file {file_name} was uploaded")
 
     except FileNotFoundError as e:
-        print(f'File {file_path} not found')
+        raise e
+    except ClientError as e:
         raise e
 
 
@@ -30,21 +34,7 @@ def log_changes_to_db(file_path, file_name):
 
         num = len(file)
 
-        current_GMT = time.gmtime()
-        time_stamp = calendar.timegm(current_GMT)
-
-        client = boto3.client('logs')
-
-        log = {'timestamp': time_stamp * 1000,
-               'message': f'Number of changes made to {file_name}: {num}'}
-
-        client.put_log_events(
-            logGroupName='MyLogger',
-            logStreamName='test_stream',
-            logEvents=[log
-                       ]
-        )
+        logger.info(f'Number of changes made to {file_name}: {num}')
 
     except Exception as e:
-        print(e, 'errrooooooor')
-        pass
+        raise e
