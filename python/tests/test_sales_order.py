@@ -9,7 +9,7 @@ from src.sales_order import (sales_order_data_frame, create_parquet, main)
 @pytest.fixture
 def create_mock_s3():
     with mock_s3():
-        s3 = boto3.client('s3', region_name='us-east-1')
+        s3 = boto3.client('s3', region_name='eu-west-2')
         s3.create_bucket(Bucket='ingested-data-vox-indicium')
         csv_data = "1,2023-07-31 12:00:00.000,2023-07-31 12:00:00.000,1,1,1,1,100.0,1,2023-07-31,2023-07-31,1\n"
         s3.put_object(Bucket='ingested-data-vox-indicium', Key='sales_order.csv', Body=csv_data)

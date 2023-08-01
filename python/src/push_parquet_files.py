@@ -28,12 +28,12 @@ def push_parquet_file(file_path):
     except FileNotFoundError:
         # Return error message if the file is not found
         return f"Error: File {file_path} not found."
-    except botocore.exceptions.EndpointConnectionError:
+    except EndpointConnectionError:
         # Return error message if unable to connect to the S3 endpoint
         return "Error: Unable to connect to the S3 endpoint"
-    except botocore.exceptions.NoCredentialsError:
+    except NoCredentialsError:
         # Return error message if no credentials are found
         return "Error: No credentials found."
-    except botocore.exceptions.ClientError as e:
+    except ClientError as e:
         # Return error message if a client error occurs
         return f"Error: {e}"

@@ -38,19 +38,27 @@ def sales_order_data_frame(table_name):
         file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=file_name)
 
         # Define the column names
-        col_names = ['sales_order_id', 'created_datetime',
-                     'last_updated_datetime','design_id', 'sales_staff_id', 'counterparty_id',
-                     'units_sold', 'unit_price', 'currency_id', 'agreed_delivery_date','agreed_payment_date',
-                      'agreed_delivery_location_id']
+        col_names = ['sales_order_id', 
+                     'created_datetime',
+                     'last_updated_datetime',
+                     'design_id', 
+                     'sales_staff_id', 
+                     'counterparty_id',
+                     'units_sold', 
+                     'unit_price', 
+                     'currency_id', 
+                     'agreed_delivery_date',
+                     'agreed_payment_date',
+                     'agreed_delivery_location_id']
         
         # Read the CSV file using the column names
         data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')), names=col_names)
 
-        # Split the datetime columns into separate date and time columns
+        # Split the create datetime column into separate date and time columns
         data_frame[['created_date', 'time']] = data_frame['created_datetime'].str.split(' ', expand=True)
         data_frame[['created_time', 't']] = data_frame['time'].str.split('.', expand=True) 
 
-        # Split the time columns into separate time columns without milliseconds
+        # Split the last update datetime into separate date and time updated columns
         data_frame[['last_updated_date', 'ltime']] = data_frame['last_updated_datetime'].str.split(' ', expand=True)
         data_frame[['last_updated_time', 'lt']] = data_frame['ltime'].str.split('.', expand=True)
 
