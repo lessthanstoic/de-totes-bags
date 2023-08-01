@@ -4,12 +4,9 @@ import calendar
 import time
 
 
-def push_data_in_bucket(directory, file_name):
+def push_data_in_bucket(file_path, file_name):
 
     try:
-
-        file_path = f'{directory}{file_name}'
-
         log_changes_to_db(file_path, file_name)
         client = boto3.client("s3")
 

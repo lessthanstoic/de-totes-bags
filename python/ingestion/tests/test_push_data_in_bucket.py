@@ -1,6 +1,7 @@
-from python.src.push_data_in_bucket import push_data_in_bucket
-# from python.src.push_data_in_bucket import log_changes_to_db
+from python.ingestion.src.push_data_in_bucket import push_data_in_bucket
+from python.ingestion.src.push_data_in_bucket import log_changes_to_db
 from moto import mock_s3, mock_logs
+from pprint import pprint
 import boto3
 from pytest import raises
 
@@ -18,7 +19,7 @@ def test_push_data_in_bucket_function():
 
     create_s3_mock_bucket()
 
-    file_path = 'python/tests/'
+    file_path = 'python/tests/test_file.csv'
     file_name = 'test_file.csv'
 
     push_data_in_bucket(file_path, file_name)
@@ -36,7 +37,7 @@ def test_error_handling_for_if_file_path_is_invalid():
 
     create_s3_mock_bucket()
 
-    file_path = 'python/'
+    file_path = 'python/test_file.csv'
     file_name = 'test_file.csv'
 
     with raises(FileNotFoundError):
@@ -53,22 +54,24 @@ def create_mock_log_group():
         logGroupName='MyLogger', logStreamName='test_stream')
 
 
-# @mock_logs
-# def test_log_changes():
-#     file_path = 'python/tests/test_file.csv'
-#     file_name = 'test_file.csv'
+@mock_logs
+def test_log_changes():
+    file_path = 'python/tests/test_file.csv'
+    file_name = 'test_file.csv'
 
-#     create_mock_log_group()
+    create_mock_log_group()
 
-#     mock_client = boto3.client('logs')
+    mock_client = boto3.client('logs')
 
-#     log_changes_to_db(file_path, file_name)
+    log_changes_to_db(file_path, file_name)
 
-#     response = mock_client.get_log_events(
-#         logGroupName='MyLogger',
-#         logStreamName='test_stream'
-#     )
+    response = mock_client.get_log_events(
+        logGroupName='MyLogger',
+        logStreamName='test_stream'
+    )
 
-#     result = response['events'][0]['message']
+    pprint(response)
 
-#     assert result == 'Number of changes made to test_file.csv: 2'
+    result = response['events'][0]['message']
+
+    assert result == 'Number of changes made to test_file.csv: 2'

@@ -1,4 +1,4 @@
-from python.src.s3_timestamp import get_s3_timestamp
+from python.ingestion.src.s3_timestamp import get_s3_timestamp
 from moto import mock_s3
 import boto3
 from pytest import raises
@@ -24,10 +24,10 @@ def test_read_datetime_from_s3_text_file():
 
 
 @mock_s3
-def test_retrieve_data_returns_default_value_if_no_file_in_bucket():
+def test_retrieve_data_error_handling():
     create_mock_s3()
-
-    assert get_s3_timestamp('no_file') == '1901-01-01 01:01:01.001'
+    with raises(ValueError, match="The file no_file does not exist"):
+        get_s3_timestamp('no_file')
 
 
 @mock_s3
