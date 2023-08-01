@@ -145,7 +145,7 @@ def postgres_data_capture(event, context):
         try:
             push_data_in_bucket("/tmp/csv_files/", param_store)
         except FileNotFoundError:
-            logger.error(f'File {param_store} not found')
+            logger.error(f'File {param_store} not found...')
         except ClientError as e:
             logger.error('Client error:', e)
 
