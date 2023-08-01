@@ -28,7 +28,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   filename   = "${path.module}/../layers/python.zip"
   layer_name = "psycopg2"
   compatible_runtimes = ["python3.10"]
-
+}
 # Lambda 1 Log Group: Creates the log group for the lambda
 # resource "aws_cloudwatch_log_group" "ingestion_lambda_log" {
 #   name = "aws/lambda/${var.ingestion_lambda_name}"
