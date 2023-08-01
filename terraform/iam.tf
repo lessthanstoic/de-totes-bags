@@ -3,6 +3,8 @@
 # lambdas
 #
 
+# Lambda 1: Ingestion Function
+#
 # Create the policy for the lambda ingestion function to use temp security credentials
 data "aws_iam_policy_document" "assume_role" {
   statement {
@@ -25,6 +27,22 @@ resource "aws_iam_role" "iam_for_lambda" {
 }
 
 
+# Lambda 2: Transformation Function
+#
+# We attached the same role as above
+resource "aws_iam_role" "iam_for_transformation_lambda" {
+  name               = "role-${var.transformation_lambda_name}"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+
+# Lambda 3: Warehousing Function
+#
+# We attached the same role as above
+resource "aws_iam_role" "iam_for_warehousing_lambda" {
+  name               = "role-${var.warehousing_lambda_name}"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
 
 ####################################################################################
 #
@@ -48,6 +66,7 @@ data "aws_iam_policy_document" "cw_document" {
     actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
 
     resources = [
+      # I presume this works for all lambdas now?
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
     ]
   }
@@ -59,17 +78,40 @@ resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
     policy_arn = aws_iam_policy.cw_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_policy_attachment" {
-    role = aws_iam_role.iam_for_lambda.name
-    policy_arn = "arn:aws:iam::170940005209:policy/get_tote_db_credentials"
+# attach the cloudwatch policy created above to the lambda IAM role
+resource "aws_iam_role_policy_attachment" "transformation_lambda_cw_policy_attachment" {
+    role = aws_iam_role.iam_for_transformation_lambda.name
+    policy_arn = aws_iam_policy_document.cw_document.arn
 }
 
+# attach the cloudwatch policy created above to the lambda IAM role
+resource "aws_iam_role_policy_attachment" "warehousing_lambda_cw_policy_attachment" {
+    role = aws_iam_role.iam_for_warehousing_lambda.name
+    policy_arn = aws_iam_policy_document.cw_document.arn
+}
 
 resource "aws_iam_policy" "cw_policy" {
   name        = "cloudwatch-log-policy"
   description = "A policy to give ingestion lambda permissions to log to cloudwatch"
   policy      = data.aws_iam_policy_document.cw_document.json
 }
+
+
+####################################################################################
+#
+# Secrets Manager
+#
+
+resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_policy_attachment" {
+    role = aws_iam_role.iam_for_lambda.name
+    policy_arn = "arn:aws:iam::170940005209:policy/get_tote_db_credentials"
+}
+
+
+####################################################################################
+#
+# S3 Write Permission
+#
 
 resource "aws_iam_policy" "s3_write_policy" {
   name = "s3-write-to-ingestion-bucket-policy"
@@ -95,21 +137,13 @@ resource "aws_iam_policy" "s3_write_policy" {
 
 
 
-
-# data "aws_iam_policy_document" "s3_write_policy_document" {
-#   statement {
-#     effect = "Allow"
-
-#     actions = [ "S3:*Object" ]
-
-#     resources = [
-#       "arn:aws:S3:::${var.ingested_bucket_name}"
-#     ]
-#   }
-# }
-
-
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment" {
     role = aws_iam_role.iam_for_lambda.name
+    policy_arn = aws_iam_policy.s3_write_policy.arn
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment_transformation" {
+    role = aws_iam_role.iam_for_transformation_lambda.name
     policy_arn = aws_iam_policy.s3_write_policy.arn
 }
