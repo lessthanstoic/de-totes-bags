@@ -52,8 +52,7 @@ def postgres_data_capture(event, context):
     cursor.execute(datetime_query)
     current_datetime = str(cursor.fetchall())
     current_datetime = re.sub(r"[,()']", "", current_datetime)
-    
-    
+
     # SQL query to fetch all records from a table
     query = '''SELECT table_name
     FROM information_schema.tables
@@ -73,9 +72,11 @@ def postgres_data_capture(event, context):
             table_query = f'''SELECT *
             FROM {table_name}
             WHERE created_at
-            BETWEEN timestamp '{old_datetime}' AND timestamp '{current_datetime}' 
+            BETWEEN timestamp '{old_datetime}'
+            AND timestamp '{current_datetime}'
             OR last_updated
-            BETWEEN timestamp '{old_datetime}' AND timestamp '{current_datetime}';'''
+            BETWEEN timestamp '{old_datetime}'
+            AND timestamp '{current_datetime}';'''
             # table_query = re.sub(r"[,()']", "", table_query)
 
             full_table_query = f'''SELECT *
@@ -88,7 +89,7 @@ def postgres_data_capture(event, context):
             for col in cursor.description:
                 columns.append(col[0])
             table_changes.insert(0, tuple(columns))
-            
+
             write_table_to_csv(table_changes, f'{table_name}_changes')
             push_data_in_bucket('/tmp/csv_files/', f'{table_name}_changes.csv')
 
@@ -99,7 +100,6 @@ def postgres_data_capture(event, context):
                 columns.append(col[0])
             full_table.insert(0, tuple(columns))
 
-        
             write_table_to_csv(full_table, table_name)
             push_data_in_bucket('/tmp/csv_files/', f'{table_name}.csv')
 

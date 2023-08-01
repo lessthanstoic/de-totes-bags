@@ -23,6 +23,3 @@ def get_s3_timestamp(filename):
         # catches the error if the user tap an incorrect input
         print(TypeError)
         raise TypeError("Function must take a string input")
-    except Exception:
-        print(Exception)
-        raise Exception("Returned Exception")
