@@ -1,7 +1,8 @@
 from python.loading.src.load_utils import ( 
     getFileFromS3,
     readParquetFromBytesObject,
-    getDataFrameFromS3Parquet )
+    getDataFrameFromS3Parquet,
+    list_parquet_files_in_bucket )
 from moto import mock_s3, mock_logs
 import boto3
 from pytest import raises
@@ -42,3 +43,26 @@ def test_can_load_parquet_to_dataframe():
     df = readParquetFromBytesObject(file)
     assert status == 200
     assert df.iloc[1].loc["1"] == 3
+
+
+@mock_s3
+def create_mock_s3_with_multiple_objects():
+    mock_client = boto3.client('s3')
+    mock_client.create_bucket(Bucket='processed-data-vox-indicium',
+                              CreateBucketConfiguration={
+                                  'LocationConstraint': 'eu-west-2', })
+    with open('python/loading/tests/fact_sales.parquet', 'rb') as data:
+        mock_client.put_object(Bucket='processed-data-vox-indicium',
+                               Body=data,
+                               Key='fact_sales.parquet')
+    with open('tasks.txt', 'rb') as data:
+        mock_client.put_object(Bucket='processed-data-vox-indicium',
+                               Body=data,
+                               Key='tasks.txt')
+        
+
+@mock_s3
+def test_lists_parquet_files_in_the_bucket():
+    create_mock_s3_with_multiple_objects()
+    obj = list_parquet_files_in_bucket('processed-data-vox-indicium')
+    assert obj == ['fact_sales.parquet']

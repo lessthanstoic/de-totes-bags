@@ -19,7 +19,7 @@ def test_push_data_in_bucket_function():
 
     create_s3_mock_bucket()
 
-    file_path = 'python/tests/test_file.csv'
+    file_path = 'python/ingestion/tests/test_file.csv'
     file_name = 'test_file.csv'
 
     push_data_in_bucket(file_path, file_name)
@@ -56,7 +56,7 @@ def create_mock_log_group():
 
 @mock_logs
 def test_log_changes():
-    file_path = 'python/tests/test_file.csv'
+    file_path = 'python/ingestion/tests/test_file.csv'
     file_name = 'test_file.csv'
 
     create_mock_log_group()
