@@ -1,61 +1,68 @@
+from python.loading.src.load_utils import (
+    getDataFrameFromS3Parquet,
+    list_parquet_files_in_bucket,
+    has_lambda_been_called)
+from python.loading.src.sql_utils import (
+    copy_from_file,
+    update_from_file,
+)
+from python.loading.src.secret_login import retrieve_secret_details
+from botocore.exceptions import ClientError
+
 import psycopg2
+import logging
 
-def update_from_file(conn, df, table):
-
-    cursor = conn.cursor()
-    update_query = f"""UPDATE {table} AS t
-                  SET name = e.name 
-                  FROM (VALUES %s) AS e(name, id) 
-                  WHERE e.id = t.id;"""
-
-    psycopg2.extras.execute_values 
-    (cursor, update_query, new_values, template=None, page_size=100 )
-
-    primary_keys = get_table_primary_key(conn, table)
-    primary_keys = ', '.join(primary_keys) (edited) 
+logger = logging.getLogger('MyLogger')
+logger.setLevel(logging.INFO)
 
 
-def get_table_primary_key(conn, table):
-    # https://wiki.postgresql.org/wiki/Retrieve_primary_key_columns
-    query = f"""
-        SELECT a.attname
-        FROM pg_index i
-        JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-        WHERE i.indrelid = '{table}'::regclass
-        AND i.indisprimary;
-    """
-    with conn.cursor() as cursor:
-        cursor.execute(query)
-        query_results = cursor.fetchall()
-    primary_keys = [x for x in query_results]
-    return primary_keys
+def push_data_in_bucket(event, context):
 
-    # Convert the DataFrame into a list of tuples
-    data_tuples = [tuple(row) for row in df.to_numpy()]
-    # get the primary keys for our table via sql query
-    # surely this should be stored in parquet meta
-    primary_keys_list = get_table_primary_key(conn, table)
-    primary_keys = ', '.join(primary_keys_list)
-    columns = df.columns.tolist()
-    column_names = ', '.join(columns)
-    value_placeholders = ', '.join(['%s'] * len(columns))
-    primary_keys_excluded = ["EXCLUDED." + x.strip() for x in primary_keys_list]
-    excluded = ', '.join(primary_keys_excluded)
-    # Define the SQL query for INSERT or UPDATE
-    merge_query = f"""
-        INSERT INTO {table} ({column_names})
-        VALUES ({value_placeholders})
-        ON CONFLICT ({primary_keys})
-        DO UPDATE SET ({primary_keys}) = ({excluded});
-    """
-    cursor = conn.cursor()
+    bucket_name = "processed-data-vox-indicium"
+
+    # Retrieve the login details from an AWS Secret Store
     try:
-        extras.execute_values(cursor, merge_query, data_tuples)
-        conn.commit()
-    except(Exception, psycopg2.DatabaseError) as e:
-        print("Error: %s" % e)
-        conn.rollback()
-        cursor.close()
-        return 1
-    # print("the dataframe is inserted") # log this instead
-    cursor.close()
+        db_login_deets = retrieve_secret_details("Totesys-Warehouse")
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'DecryptionFailure':
+            logger.error(
+                "The requested secret can't be decrypted:", e)
+        elif e.response['Error']['Code'] == 'InternalServiceError':
+            logger.error('An error occurred on service side:', e)
+        else:
+            logger.error('Database credentials could not be retrieved:', e)
+        raise e
+
+    # Use psycopg2 and credentials from the secret store to connect
+    # to our data warehouse
+    try:
+        connection = psycopg2.connect(
+            host=db_login_deets['host'],
+            port=int(db_login_deets['port']),
+            database=db_login_deets['database'],
+            user=db_login_deets['username'],
+            password=db_login_deets['password']
+        )
+        logger.info('Connected to Totesys database...')
+    except psycopg2.Error as e:
+        logger.error('Unable to connect to the database:', e)
+        raise e
+
+    # If the lambda has been called before we only want to update
+    # the relevant tables
+    # If it has not been called before we want to seed the
+    # data warehouse with initial data (easier)
+    if has_lambda_been_called():
+        pq_files = list_parquet_files_in_bucket()
+        for file in pq_files:
+            df = getDataFrameFromS3Parquet(bucket_name, file)
+            table_name = file.split(".")[0]
+            update_from_file(connection, df, table_name)
+    else:
+        pq_files = list_parquet_files_in_bucket()
+        for file in pq_files:
+            df = getDataFrameFromS3Parquet(bucket_name, file)
+            table_name = file.split(".")[0]
+            copy_from_file(connection, df, table_name)
+
+    connection.close()

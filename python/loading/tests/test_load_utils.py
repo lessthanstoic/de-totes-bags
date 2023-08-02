@@ -1,14 +1,11 @@
-from python.loading.src.load_utils import ( 
+from python.loading.src.load_utils import (
     getFileFromS3,
     readParquetFromBytesObject,
     getDataFrameFromS3Parquet,
     list_parquet_files_in_bucket,
-    has_lambda_been_called )
-from moto import mock_s3, mock_logs
+    has_lambda_been_called)
+from moto import mock_s3
 import boto3
-from pytest import raises
-import pandas as pd
-import os
 
 
 @mock_s3
@@ -26,22 +23,25 @@ def create_mock_s3():
 @mock_s3
 def test_can_read_file_from_s3_bucket():
     create_mock_s3()
-    file, status = getFileFromS3('processed-data-vox-indicium', 'fact_sales.parquet')
+    file, status = getFileFromS3('processed-data-vox-indicium',
+                                 'fact_sales.parquet')
     assert status == 200
 
 
 @mock_s3
 def test_can_load_parquet_to_dataframe():
     create_mock_s3()
-    df = getDataFrameFromS3Parquet('processed-data-vox-indicium', 'fact_sales.parquet')
+    df = getDataFrameFromS3Parquet('processed-data-vox-indicium',
+                                   'fact_sales.parquet')
     assert 1 == 1
     assert df.iloc[1].loc["1"] == 3
 
 
 @mock_s3
-def test_can_load_parquet_to_dataframe():
+def test_can_load_parquet_to_dataframe_two_functions():
     create_mock_s3()
-    file, status = getFileFromS3('processed-data-vox-indicium', 'fact_sales.parquet')
+    file, status = getFileFromS3('processed-data-vox-indicium',
+                                 'fact_sales.parquet')
     df = readParquetFromBytesObject(file)
     assert status == 200
     assert df.iloc[1].loc["1"] == 3
@@ -61,7 +61,7 @@ def create_mock_s3_with_multiple_objects():
         mock_client.put_object(Bucket='processed-data-vox-indicium',
                                Body=data,
                                Key='tasks.txt')
-        
+
 
 @mock_s3
 def test_lists_parquet_files_in_the_bucket():
@@ -72,11 +72,10 @@ def test_lists_parquet_files_in_the_bucket():
 
 @mock_s3
 def test_environment_variable_returns_false_if_not_set():
-   assert has_lambda_been_called() == False
+    assert not has_lambda_been_called()
 
 
 @mock_s3
 def test_environment_variable_returns_true_if_set():
-   has_lambda_been_called()
-   assert has_lambda_been_called() == True
-    
+    has_lambda_been_called()
+    assert has_lambda_been_called()
