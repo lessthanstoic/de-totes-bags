@@ -78,6 +78,7 @@ def test_function_raises_error_when_dates_are_incorrectly_formatted():
 
     pass
 
+
 def test_raises_error_if_not_passed_dataframe():
 
     with raises(TypeError):

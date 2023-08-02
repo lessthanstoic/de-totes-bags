@@ -77,7 +77,7 @@ def dim_date_transformation(dataframe):
         raise e
 
     except ValueError as e:
-        print('Error while producing dim_date: rows not of equal length')
+        print('Error while producing dim_date: column not in expected format')
         raise e
 
     except TypeError as e:
