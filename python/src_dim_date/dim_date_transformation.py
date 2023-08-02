@@ -73,7 +73,6 @@ def dim_date_transformation(dataframe):
 
     except KeyError as e:
         print('Error while producing dim_date: column does not exist')
-        print(e)
         raise e
 
     except ValueError as e:
