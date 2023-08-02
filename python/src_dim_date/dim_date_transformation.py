@@ -1,53 +1,80 @@
 import pandas as pd
 from datetime import datetime
+"""This module contains a single function - dim_date_transformation.
+
+    This function converts a passed fact_sales_order_dataframe and converts it
+    into a third normalized dim_date dataframe
+
+    Standard use: dim_date_transformation(pandas dataframe handler)
+"""
+
 
 def dim_date_transformation(dataframe):
+    """This function takes a pandas dataframe as an input,
+        extracts dates as strings from four seperate columns,
+        filters for unique dates, and then transforms the data into a
+        third normalised form
 
-    print(dataframe)
+        Arguments: - dataframe (Pandas dataframe with columns named:
+                - created_date
+                - last_updated_date
+                - agreed_payment_date
+                - agreed_delivery_date
+                with string values)
 
-    print(dataframe.values)
+        Returns: - dataframe (Pandas dataframe with columns named:
+                date_id (string)
+                year (int)
+                month (int)
+                day (int)
+                day_of_week (int)
+                day_name (string)
+                month_name (string)
+                quarter (int))
 
-    created_list = list(dataframe['created_date'])
-    updated_list = list(dataframe['last_updated_date'])
-    payment_list = list(dataframe['agreed_payment_date'])
-    delivery_list = list(dataframe['agreed_delivery_date'])
+        Errors: - KeyError - if dataframe does not contain necessary columns
+                - ValueError - if date columns are correctly formatted"""
 
-    all_dates = created_list + updated_list + payment_list + delivery_list
-    unique_dates = []
-    [unique_dates.append(x) for x in all_dates if x not in unique_dates]
+    try:
 
-    print(unique_dates)
+        created_list = list(dataframe['created_date'])
+        updated_list = list(dataframe['last_updated_date'])
+        payment_list = list(dataframe['agreed_payment_date'])
+        delivery_list = list(dataframe['agreed_delivery_date'])
 
-    output_data = {'date_id' : unique_dates, 'year'  : [], 'month' : [], 'day' : [], 'day_of_week' : [], 'day_name' : [], 'month_name' : [], 'quarter': []}
+        all_dates = created_list + updated_list + payment_list + delivery_list
+        unique_dates = []
+        [unique_dates.append(x) for x in all_dates if x not in unique_dates]
 
+        print(unique_dates)
 
-    for date in unique_dates:
+        output_data = {'date_id': unique_dates, 'year': [],
+                       'month': [], 'day': [], 'day_of_week': [],
+                       'day_name': [], 'month_name': [], 'quarter': []}
 
-        date_format = '%Y/%m/%d'
+        for date in unique_dates:
 
-        date_obj = datetime.strptime(date, date_format)
-        
-        print(date_obj)
-        # output_data['year'].append(    )
-        # output_data['month'].append(    )
-        # output_data['day'].append(    )
-        # output_data['day_of_week'].append(    )
-        # output_data['day_name'].append(    )
-        # output_data['month_name'].append(    )
-        # output_data['quarter'].append(    )
+            date_format = '%d/%m/%Y'
 
-        pass
+            date_obj = datetime.strptime(date, date_format)
 
+            print(date_obj)
 
+            output_data['year'].append(date_obj.year)
+            output_data['month'].append(date_obj.month)
+            output_data['day'].append(date_obj.day)
+            output_data['day_of_week'].append(date_obj.weekday())
+            output_data['day_name'].append(date_obj.strftime('%A'))
+            output_data['month_name'].append(date_obj.strftime('%B'))
+            output_data['quarter'].append((date_obj.month-1)//3 + 1)
 
-    # bring in dataframe of fact_sales_order_table ✅
-    # look at 4 different columns (ending in date) ✅
-    # filter unique dates - is there a way to do this in pandas? (populate list with dates and remove duplicates) ✅
-    # mess about with them - divide into year, month, day_of_week, day_of_week, month_name, quarter:
-    # again, can we do this is pandas? if not python has a package
-    # repopulate dataframe with this information
-    # export new dataframe
+        return pd.DataFrame(data=output_data)
 
+    except KeyError as e:
+        print('Error while producing dim_date: column does not exist')
+        print(e)
+        raise e
 
-
-    pass
+    except ValueError as e:
+        print('Error while producing dim_date: rows not of equal length')
+        raise e
