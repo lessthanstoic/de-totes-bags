@@ -3,7 +3,7 @@ import pandas as pd
 import boto3
 import os
 from moto import mock_s3
-from python.transformation_function.src.fact_sales_order import (fact_sales_order_data_frame, create_and_push_parquet, main)
+from python.transformation_function.src.sales_order import (sales_order_data_frame, create_parquet, push_parquet_file, main)
 import tempfile
 
 # Set up the mock S3 environment and create a CSV for testing
