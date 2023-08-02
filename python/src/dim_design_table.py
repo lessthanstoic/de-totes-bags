@@ -86,50 +86,26 @@ def design_table_data_frame(table_name):
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
 
-def create_parquet(data_frame, table_name):
-    """
-    Convert the DataFrame to a parquet format.
+def create_and_push_parquet(data_frame, table_name):
+    '''
+    Convert the DataFrames to a parquet format and push it to the processed s3 bucket.
     Arguments:
-    data_frame - represent the DataFrame from the function design_table_data_frame.
-    table_name (string) - represents the name of a table in our database.
-    """
+    data_frame - represent the DataFrame from of sales table the function fact_sales_order_data_frame.
+    table_name(string) - represents the name of a table in our database.
+    '''
     try:
        # Save DataFrame to a parquet file in memory
         parquet_buffer = io.BytesIO()
         data_frame.to_parquet(parquet_buffer, engine='pyarrow')
 
         s3 = boto3.client('s3')
-        s3.put_object(Bucket='ingested-data-vox-indicium', Key=f'{table_name}.parquet', Body=parquet_buffer.getvalue())
-
-        print(f"Parquet file '{table_name}.parquet' created in S3 bucket 'ingested-data-vox-indicium'.")
+        s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{table_name}.parquet', Body=parquet_buffer.getvalue())
+       
+        print(f"Parquet file '{table_name}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
         
     except Exception as e:
         # Generic exception for unexpected errors during conversion
         raise Exception(f"An error occurred while converting to parquet: {e}")
-    
-def push_parquet_file(table_name):
-    """
-    Function to copy a Parquet file from one Amazon S3 bucket to another, then delete the original.
-    param table_name: Name of the table (without extension) to be transferred.
-    """
-    try:
-        s3 = boto3.client('s3')
-        s3_resource = boto3.resource('s3')
-
-        # Copy the parquet file
-        copy_source = {
-            'Bucket': 'ingested-data-vox-indicium',
-            'Key': f'{table_name}.parquet'
-        }
-
-        s3_resource.meta.client.copy(copy_source, 'processed-data-vox-indicium', f'{table_name}.parquet')
-
-        # Delete the original parquet file
-        s3.delete_object(Bucket='ingested-data-vox-indicium', Key=f'{table_name}.parquet')
-
-        print(f"Parquet file '{table_name}.parquet' transferred to S3 bucket 'processed-data-vox-indicium'.")
-    except Exception as e:
-        raise Exception(f"An error occurred while transferring the parquet file: {e}")
     
 def main():
     """
@@ -137,11 +113,10 @@ def main():
     """
     try:
         table_name = 'design'
+        dim_design = "dim_design"
         df = design_table_data_frame(table_name)
 
-        create_parquet(df, table_name)
-
-        push_parquet_file(table_name)
+        create_and_push_parquet(df, dim_design)
 
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
