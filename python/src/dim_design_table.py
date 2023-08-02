@@ -1,6 +1,6 @@
 """
 This module reads .csv files from our ingestion bucket, and converts them to a pandas data frame.
-This module contains three functions:
+This module contains four functions:
 design_table_data_frame- reads the CSV file and returns a DataFrame.
 create_parquet - converts the DataFrame to a parquet file.
 push_parquet_file - push the parquet file in the process data bucket

@@ -1,3 +1,12 @@
+"""
+This module reads .csv files from our ingestion bucket, and converts them to a pandas data frame.
+This module contains four functions:
+dim_counterparty_data_frame - reads the CSV files and returns a DataFrame.
+create_parquet - converts the DataFrame to a parquet file.
+push_parquet_file - push the parquet file in the process data bucket
+main - runs all functions to create the final parquet file.
+"""
+
 import boto3
 import pandas as pd
 import io
@@ -7,12 +16,16 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
     """
     The function dim_counterparty_data_frame reads a .csv file from our ingestion bucket and manipulate columns name with specific datatype and return a nice data frame.
     Arguments:
-    counterparty_table (string) - represents the name of a table in our database.
+    counterparty_table (string) - represents the name of counterparty table from ingestion bucket.
+    address_table (string) - represents the name of address table from ingestion bucket.
     Output:
-    resulting_df (DataFrame) - outputs the read .csv file as a pandas DataFrame for use with other functions
+    data_frame (DataFrame) - outputs the read .csv files as a pandas DataFrame with information from the both tables
     Errors:
     TypeError - if input is not a string
-    ValueError - if input is not a valid table name
+    ValueError - Catching the specific ValueError
+    ClientError - Catch the error if the table name is non-existent
+    FileNotFoundError - if the file was not found
+    Exception - for general errors 
 
     """
     
@@ -164,6 +177,7 @@ def main():
     try:
         counterparty_table = 'counterparty'
         address_table = 'address'
+
         df = dim_counterparty_data_frame(counterparty_table, address_table)
 
         create_parquet(df, counterparty_table)
