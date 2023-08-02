@@ -33,7 +33,8 @@ def dim_date_transformation(dataframe):
                 quarter (int))
 
         Errors: - KeyError - if dataframe does not contain necessary columns
-                - ValueError - if date columns are correctly formatted"""
+                - ValueError - if date columns are correctly formatted
+                - TypeError - if not passed dataframe as argument"""
 
     try:
 
@@ -77,4 +78,8 @@ def dim_date_transformation(dataframe):
 
     except ValueError as e:
         print('Error while producing dim_date: rows not of equal length')
+        raise e
+
+    except TypeError as e:
+        print('Error while producing dim_date: argument not a dataframe')
         raise e

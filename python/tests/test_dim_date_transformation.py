@@ -77,3 +77,10 @@ def test_function_raises_error_when_dates_are_incorrectly_formatted():
         dim_date_transformation(mock_df)
 
     pass
+
+def test_raises_error_if_not_passed_dataframe():
+
+    with raises(TypeError):
+        dim_date_transformation([2, 4, 5, 6, 7])
+
+    pass
