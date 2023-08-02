@@ -2,11 +2,13 @@ from python.loading.src.load_utils import (
     getFileFromS3,
     readParquetFromBytesObject,
     getDataFrameFromS3Parquet,
-    list_parquet_files_in_bucket )
+    list_parquet_files_in_bucket,
+    has_lambda_been_called )
 from moto import mock_s3, mock_logs
 import boto3
 from pytest import raises
 import pandas as pd
+import os
 
 
 @mock_s3
@@ -66,3 +68,15 @@ def test_lists_parquet_files_in_the_bucket():
     create_mock_s3_with_multiple_objects()
     obj = list_parquet_files_in_bucket('processed-data-vox-indicium')
     assert obj == ['fact_sales.parquet']
+
+
+@mock_s3
+def test_environment_variable_returns_false_if_not_set():
+   assert has_lambda_been_called() == False
+
+
+@mock_s3
+def test_environment_variable_returns_true_if_set():
+   has_lambda_been_called()
+   assert has_lambda_been_called() == True
+    
