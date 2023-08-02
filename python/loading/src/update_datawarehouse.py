@@ -5,6 +5,7 @@ from python.loading.src.load_utils import (
 from python.loading.src.sql_utils import (
     copy_from_file,
     update_from_file,
+    get_table_primary_key
 )
 from python.loading.src.secret_login import retrieve_secret_details
 from botocore.exceptions import ClientError
@@ -57,7 +58,8 @@ def push_data_in_bucket(event, context):
         for file in pq_files:
             df = getDataFrameFromS3Parquet(bucket_name, file)
             table_name = file.split(".")[0]
-            update_from_file(connection, df, table_name)
+            primary_keys_list = get_table_primary_key(connection, table_name)
+            update_from_file(connection, df, table_name, primary_keys_list)
     else:
         pq_files = list_parquet_files_in_bucket()
         for file in pq_files:

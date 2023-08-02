@@ -25,6 +25,12 @@ def copy_from_file(conn, df, table):
     f = open(tmp_df, 'r')
     cursor = conn.cursor()
     try:
+        # Thinking ahead of time:
+        # if we have quotes and comma's together
+        # ie. ",Madrid,SN,,SEN,,,SN,173,157"
+        # the we may need to do similar to the below to make it work:
+        # curs.copy_expert("""COPY mytable
+        # FROM STDIN WITH (FORMAT CSV)""", _io_buffer)
         cursor.copy_from(f, table, sep=",")
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -61,25 +67,34 @@ def copy_from_stringio(conn, df, table):
     cursor.close()
 
 
-def update_from_file(conn, df, table):
+def update_from_file(conn, df, table, primary_keys_list):
     # Convert the DataFrame into a list of tuples
+    # This is essentially a tuple per row of data we wish to insert
     data_tuples = [tuple(row) for row in df.to_numpy()]
+    print(data_tuples)
     # get the primary keys for our table via sql query
     # surely this should be stored in parquet meta?
-    primary_keys_list = get_table_primary_key(conn, table)
+    # primary_keys_list = get_table_primary_key(conn, table)
     primary_keys = ', '.join(primary_keys_list)
     columns = df.columns.tolist()
     column_names = ', '.join(columns)
-    value_placeholders = ', '.join(['%s'] * len(columns))
+    # value_placeholders = ', '.join(['%s'] * len(columns))
+    # print( value_placeholders )
     primary_keys_excluded = ["EXCLUDED." + x.strip()
                              for x in primary_keys_list]
     excluded = ', '.join(primary_keys_excluded)
     # Define the SQL query for INSERT
     # This query should mimic a MERGE
     # ala https://www.postgresql.org/docs/current/sql-insert.html
+    # merge_query = f"""
+    #     INSERT INTO {table} ({column_names})
+    #     VALUES ({value_placeholders})
+    #     ON CONFLICT ({primary_keys})
+    #     DO UPDATE SET ({primary_keys}) = ({excluded});
+    # """
     merge_query = f"""
         INSERT INTO {table} ({column_names})
-        VALUES ({value_placeholders})
+        VALUES %s
         ON CONFLICT ({primary_keys})
         DO UPDATE SET ({primary_keys}) = ({excluded});
     """
@@ -92,7 +107,7 @@ def update_from_file(conn, df, table):
         conn.rollback()
         cursor.close()
         raise e
-    logger.info("the dataframe is inserted")
+    logger.info(f"{table} has been updated")
     cursor.close()
 
 
@@ -106,12 +121,11 @@ def get_table_primary_key(conn, table):
         WHERE i.indrelid = '{table}'::regclass
         AND i.indisprimary;
     """
-
+    cursor = conn.cursor()
     try:
-        with conn.cursor() as cursor:
-            cursor.execute(query)
-            query_results = cursor.fetchall()
-        primary_keys = [row for row in query_results]
+        cursor.execute(query)
+        query_results = cursor.fetchall()
+        primary_keys = [row[0] for row in query_results]
     except (Exception, psycopg2.DatabaseError) as e:
         print("Error: %s" % e)
         conn.rollback()
