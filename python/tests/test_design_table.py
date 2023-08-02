@@ -16,7 +16,7 @@ def create_mock_s3():
         s3.put_object(Bucket='ingested-data-vox-indicium', Key='design.csv', Body=csv_data)
         yield
 
-# Test the design_table_data_frame function
+# Test the design_table_data_frame function 
 def test_design_table_data_frame(create_mock_s3):
     result = design_table_data_frame('design')
     assert isinstance(result, pd.DataFrame)
