@@ -12,7 +12,6 @@ resource "aws_lambda_function" "s3_file_reader" {
 }
 
 # creates the log group for the lambda - done automatically through aws
-
 resource "aws_cloudwatch_log_group" "ingestion_lambda_log" {
   name = "/aws/lambda/${var.ingestion_lambda_name}"
   retention_in_days = 30
@@ -44,14 +43,14 @@ resource "aws_lambda_function" "data_transform" {
   role = aws_iam_role.iam_for_transformation_lambda.arn
   handler = "transform.lambda_handler" # pythonfilename.functionname
   runtime = var.pythonversion
-#   depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
+  depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
 }
 
 # Lambda 2 Log Group: Creates the log group for the lambda
-# resource "aws_cloudwatch_log_group" "transform_lambda_log" {
-#   name = "aws/lambda/${var.transformation_lambda_name}"
-#   retention_in_days = 30
-# }
+resource "aws_cloudwatch_log_group" "transform_lambda_log" {
+  name = "aws/lambda/${var.transformation_lambda_name}"
+  retention_in_days = 30
+}
 
 # Lambda 3: Data Loading 
 resource "aws_lambda_function" "data_warehouse" {
@@ -61,11 +60,11 @@ resource "aws_lambda_function" "data_warehouse" {
   role = aws_iam_role.iam_for_warehousing_lambda.arn
   handler = "warehouse.lambda_handler" # pythonfilename.functionname
   runtime = var.pythonversion
-#   depends_on = [ aws_cloudwatch_log_group.warehouse_lambda_log ]
-  }
+  depends_on = [ aws_cloudwatch_log_group.warehouse_lambda_log ]
+}
 
 # Lambda 3 Log Group: Creates the log group for the lambda
-# resource "aws_cloudwatch_log_group" "warehouse_lambda_log" {
-#   name = "aws/lambda/${var.warehousing_lambda_name}"
-#   retention_in_days = 30
-# }
+resource "aws_cloudwatch_log_group" "warehouse_lambda_log" {
+  name = "aws/lambda/${var.warehousing_lambda_name}"
+  retention_in_days = 30
+}

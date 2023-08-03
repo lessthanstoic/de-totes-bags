@@ -6,7 +6,33 @@
 # Lambda 1: Ingestion Function
 #
 # Create the policy for the lambda ingestion function to use temp security credentials
-data "aws_iam_policy_document" "assume_role" {
+data "aws_iam_policy_document" "ingestion_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+data "aws_iam_policy_document" "transformation_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+data "aws_iam_policy_document" "loading_assume_role" {
   statement {
     effect = "Allow"
 
@@ -23,7 +49,7 @@ data "aws_iam_policy_document" "assume_role" {
 # provides an IAM role for the lambda and attaches the above policy, so it can use the credentials
 resource "aws_iam_role" "iam_for_ingestion_lambda" {
   name               = "role-${var.ingestion_lambda_name}"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.ingestion_assume_role.json
 }
 
 
@@ -32,7 +58,7 @@ resource "aws_iam_role" "iam_for_ingestion_lambda" {
 # We attached the same role as above
 resource "aws_iam_role" "iam_for_transformation_lambda" {
   name               = "role-${var.transformation_lambda_name}"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.transformation_assume_role.json
 }
 
 
@@ -41,7 +67,7 @@ resource "aws_iam_role" "iam_for_transformation_lambda" {
 # We attached the same role as above
 resource "aws_iam_role" "iam_for_warehousing_lambda" {
   name               = "role-${var.warehousing_lambda_name}"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.loading_assume_role.json
 }
 
 ####################################################################################

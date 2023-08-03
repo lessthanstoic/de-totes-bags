@@ -45,9 +45,7 @@ resource "aws_cloudwatch_event_rule" "txtfile_to_s3_lambda" {
       "eventSource": ["s3.amazonaws.com"],
       "eventName": ["PutObject"],
       "requestParameters": { 
-        "bucketName": [
-        { "StringEquals": { "aws:sourceArn": "arn:aws:s3:::ingested-data-vox-indicium" } }
-      ],
+        "bucketName": ["ingested-data-vox-indicium"],
       "key": [{ "suffix": ".txt" }]
       }
     }
@@ -86,9 +84,7 @@ resource "aws_cloudwatch_event_rule" "parquet_to_s3_lambda" {
       "eventSource": ["s3.amazonaws.com"],
       "eventName": ["PutObject"],
       "requestParameters": { 
-        "bucketName": [
-        { "StringEquals": { "aws:sourceArn": "arn:aws:s3:::processed-data-vox-indicium" } }
-      ],
+        "bucketName": [processed-data-vox-indicium"],
       "key": [{ "suffix": ".parquet" }]
       }
     }

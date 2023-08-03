@@ -31,7 +31,8 @@ resource "aws_cloudwatch_log_metric_filter" "alert_for_transformation_error" {
   name           = "transformation_error"
   # will need to change the pattern
   pattern        = "ERROR"
-  log_group_name = "/aws/lambda/transformation-alert"
+  # log_group_name = "/aws/lambda/transformation-alert"
+  log_group_name = aws_cloudwatch_log_group.transform_lambda_log.name
 
   metric_transformation {
     name      = "TransformationError"
@@ -58,7 +59,8 @@ resource "aws_cloudwatch_log_metric_filter" "alert_for_warehousing_error" {
   name           = "warehousing_error"
   # will need to change the pattern
   pattern        = "ERROR"
-  log_group_name = "/aws/lambda/warehousing-alert"
+  # log_group_name = "/aws/lambda/warehousing-alert"
+  log_group_name = aws_cloudwatch_log_group.warehouse_lambda_log.name
 
   metric_transformation {
     name      = "WarehousingError"
