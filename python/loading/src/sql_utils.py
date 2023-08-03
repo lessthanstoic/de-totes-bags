@@ -70,8 +70,13 @@ def copy_from_stringio(conn, df, table):
 def update_from_file(conn, df, table, primary_keys_list):
     # Convert the DataFrame into a list of tuples
     # This is essentially a tuple per row of data we wish to insert
-    data_tuples = [tuple(row) for row in df.to_numpy()]
-    print(data_tuples)
+    if len(df.index) == 0:
+        logger.info("No data to copy")
+        return
+    elif len(df.index) == 1:
+        data_tuples = tuple(df.to_numpy()[0])
+    else:
+        data_tuples = [tuple(row) for row in df.to_numpy()]
     # get the primary keys for our table via sql query
     # surely this should be stored in parquet meta?
     # primary_keys_list = get_table_primary_key(conn, table)

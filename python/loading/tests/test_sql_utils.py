@@ -121,3 +121,27 @@ def test_we_can_retrieve_primary_keys(mock_connect):
 #     # Some basic asserts we can make
 #     mock_conn.cursor.assert_called_once()
 #     # mock_conn.commit.assert_called_once()
+
+
+# Alas I cannot find a way to mock test this functionality
+# @mock.patch('psycopg2.connect')
+# def test_update_warehouse_from_file_single_row(mock_connect):
+#     # ARRANGE
+#     # Mocking the database connection
+#     mock_conn = mock_connect.return_value
+#     mock_cursor = mock_conn.cursor.return_value
+
+#     data = {
+#         'Column1': [10],
+#         'Column2': ['A']
+#     }
+#     df = pd.DataFrame(data)
+
+#     # ACT
+#     # Call the function being tested
+#     update_from_file(mock_conn, df, "sales_order", ['Column1'])
+
+#     # ASSERT
+#     # Some basic asserts we can make
+#     mock_conn.cursor.assert_called_once()
+#     # mock_conn.commit.assert_called_once()
