@@ -49,6 +49,7 @@ resource "aws_cloudwatch_event_rule" "txtfile_to_s3_lambda" {
         { "StringEquals": { "aws:sourceArn": "arn:aws:s3:::ingested-data-vox-indicium" } }
       ],
       "key": [{ "suffix": ".txt" }]
+      }
     }
   }
   EOF
@@ -89,6 +90,7 @@ resource "aws_cloudwatch_event_rule" "parquet_to_s3_lambda" {
         { "StringEquals": { "aws:sourceArn": "arn:aws:s3:::processed-data-vox-indicium" } }
       ],
       "key": [{ "suffix": ".parquet" }]
+      }
     }
   }
   EOF
