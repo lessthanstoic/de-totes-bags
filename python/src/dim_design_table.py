@@ -25,8 +25,6 @@ def dim_design_table_data_frame(design_table):
     Exception - for general errors
     """
 
-    """"""
-
     try:
         # Check for empty input name
         if len(design_table)==0:
