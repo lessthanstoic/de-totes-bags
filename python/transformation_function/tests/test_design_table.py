@@ -12,7 +12,7 @@ def create_mock_s3():
         s3 = boto3.client('s3', region_name='eu-west-2')
         s3.create_bucket(Bucket='ingested-data-vox-indicium', CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
         s3.create_bucket(Bucket='processed-data-vox-indicium', CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
-        csv_data = "8,2022-11-03 14:20:49.962000,Wooden,/usr,wooden-20220717-npgz.json,2022-11-03 14:20:49.962000\n"
+        csv_data = "design_id,created_at,design_name,file_location,file_name,last_updated\n8,2022-11-03 14:20:49.962000,Wooden,/usr,wooden-20220717-npgz.json,2022-11-03 14:20:49.962000\n"
         s3.put_object(Bucket='ingested-data-vox-indicium', Key='design.csv', Body=csv_data)
         yield
 

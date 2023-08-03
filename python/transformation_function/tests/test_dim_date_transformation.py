@@ -6,21 +6,21 @@ from pytest import raises
 def test_extracts_dates_from_four_columns_fact_table_and_transforms_data():
 
     d = {'sales_record_id': [1, 2], 'sales_order_id': [13, 54],
-         'created_date': ['12/01/2023', '24/12/2023'],
+         'created_date': ['2023-01-12', '2023-12-24'],
          'created_time': ['13:00', '14:30'],
-         'last_updated_date': ['16/04/2023', '18/07/2023'],
+         'last_updated_date': ['2023-04-16', '2023-07-18'],
          'last_updated_time': ['12:00', '14:00'],
          'sales_staff_id': [4, 7], 'counterparty_id': [34, 2],
          'units_sold': [4, 5], 'unit_price': [6.54, 4.22],
          'currency_id': [1, 3], 'design_id': [1, 1],
-         'agreed_payment_date': ['31/07/2023', '02/08/2023'],
-         'agreed_delivery_date': ['31/07/2023', '02/08/2023'],
+         'agreed_payment_date': ['2023-07-31', '2023-08-02'],
+         'agreed_delivery_date': ['2023-07-31', '2023-08-02'],
          'agreed_delivery_location_id': [3, 7]}
 
     mock_df = pd.DataFrame(data=d)
 
-    xd = {'date_id': ['12/01/2023', '24/12/2023', '16/04/2023',
-                      '18/07/2023', '31/07/2023', '02/08/2023'],
+    xd = {'date_id': ['2023-01-12', '2023-12-24', '2023-04-16',
+                      '2023-07-18', '2023-07-31', '2023-08-02'],
           'year': [2023, 2023, 2023, 2023, 2023, 2023],
           'month': [1, 12, 4, 7, 7, 8], 'day': [12, 24, 16, 18, 31, 2],
           'day_of_week': [3, 6, 6, 1, 0, 2],
