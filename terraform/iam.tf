@@ -78,14 +78,14 @@ resource "aws_iam_role" "iam_for_warehousing_lambda" {
 # cloudwatch policy (defines the permissions to be attributed to a role) 
 # which allows the creation and "put" to the logs
 data "aws_iam_policy_document" "ingestion_cw_document" {
-  statement {
+  # statement {
 
-    actions = [ "logs:CreateLogGroup" ]
+  #   actions = [ "logs:CreateLogGroup" ]
 
-    resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-    ]
-  }
+  #   resources = [
+  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+  #   ]
+  # }
 
   statement {
 
@@ -102,14 +102,14 @@ data "aws_iam_policy_document" "ingestion_cw_document" {
 # Unfortunately we need another policy, even if identical
 # https://github.com/hashicorp/terraform/issues/11873
 data "aws_iam_policy_document" "transformation_cw_document" {
-  statement {
+  # statement {
 
-    actions = [ "logs:CreateLogGroup" ]
+  #   actions = [ "logs:CreateLogGroup" ]
 
-    resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-    ]
-  }
+  #   resources = [
+  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+  #   ]
+  # }
 
   statement {
 
@@ -125,14 +125,14 @@ data "aws_iam_policy_document" "transformation_cw_document" {
 # Unfortunately we need another policy, even if identical
 # https://github.com/hashicorp/terraform/issues/11873
 data "aws_iam_policy_document" "loading_cw_document" {
-  statement {
+  # statement {
 
-    actions = [ "logs:CreateLogGroup" ]
+  #   actions = [ "logs:CreateLogGroup" ]
 
-    resources = [
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-    ]
-  }
+  #   resources = [
+  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+  #   ]
+  # }
 
   statement {
 

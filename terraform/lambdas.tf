@@ -48,7 +48,7 @@ resource "aws_lambda_function" "data_transform" {
 
 # Lambda 2 Log Group: Creates the log group for the lambda
 resource "aws_cloudwatch_log_group" "transform_lambda_log" {
-  name = "aws/lambda/${var.transformation_lambda_name}"
+  name = "/aws/lambda/${var.transformation_lambda_name}"
   retention_in_days = 30
 }
 
@@ -65,6 +65,6 @@ resource "aws_lambda_function" "data_warehouse" {
 
 # Lambda 3 Log Group: Creates the log group for the lambda
 resource "aws_cloudwatch_log_group" "warehouse_lambda_log" {
-  name = "aws/lambda/${var.warehousing_lambda_name}"
+  name = "/aws/lambda/${var.warehousing_lambda_name}"
   retention_in_days = 30
 }
