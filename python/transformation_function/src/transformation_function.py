@@ -4,6 +4,7 @@ from python.transformation_function.src.dim_currency import dim_currency_data_fr
 from python.transformation_function.src.dim_date_transformation import dim_date_transformation
 from python.transformation_function.src.dim_design_table import design_table_data_frame
 from python.transformation_function.src.fact_sales_order import fact_sales_order_data_frame, create_and_push_parquet
+from python.transformation_function.src.dim_date_transformation import dim_date_transformation
 
 from pprint import pprint
 
@@ -21,3 +22,14 @@ def transformation_function(event, context):
     counterparty_parquet = create_and_push_parquet(counterparty_df, "counterparty_changes")
     pprint(counterparty_parquet)
     
+    location_df = dim_address_data_frame("address_changes")
+    location_parquet = create_and_push_parquet(location_df, "location_changes")
+    pprint(location_parquet)
+
+    sales_order_df = fact_sales_order_data_frame("sales_order_changes")
+    sales_order_parquet = create_and_push_parquet(sales_order_df, "sales_order_changes")
+    pprint(sales_order_parquet)
+
+    date_df = dim_date_transformation(sales_order_df)
+    date_parquet = create_and_push_parquet(date_df, "date_changes")
+    pprint(date_parquet)

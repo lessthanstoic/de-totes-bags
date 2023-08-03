@@ -38,7 +38,7 @@ def dim_date_transformation(dataframe):
                 - TypeError - if not passed dataframe as argument"""
 
     try:
-
+    
         created_list = list(dataframe['created_date'])
         updated_list = list(dataframe['last_updated_date'])
         payment_list = list(dataframe['agreed_payment_date'])
@@ -48,19 +48,17 @@ def dim_date_transformation(dataframe):
         unique_dates = []
         [unique_dates.append(x) for x in all_dates if x not in unique_dates]
 
-        print(unique_dates)
-
         output_data = {'date_id': unique_dates, 'year': [],
                        'month': [], 'day': [], 'day_of_week': [],
                        'day_name': [], 'month_name': [], 'quarter': []}
 
         for date in unique_dates:
 
-            date_format = '%d/%m/%Y'
+            date_format = '%Y-%m-%d'
 
             date_obj = datetime.strptime(date, date_format)
 
-            print(date_obj)
+        
 
             output_data['year'].append(date_obj.year)
             output_data['month'].append(date_obj.month)

@@ -29,40 +29,33 @@ def dim_address_data_frame(table_name):
 
         file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=file_name)
 
-        # Define the column names
-        col_names = ["address_id",
-                     "address_line_1",
-                     "address_line_2",
-                     "district",
-                     "city",
-                     "postal_code",
-                     "country",
-                     "phone",
-                     "created_at",
-                     "last_updated"
-                     ]
+        # # Define the column names
+        # col_names = ["address_id",
+        #              "address_line_1",
+        #              "address_line_2",
+        #              "district",
+        #              "city",
+        #              "postal_code",
+        #              "country",
+        #              "phone",
+        #              "created_at",
+        #              "last_updated"
+        #              ]
 
         # Read the CSV file using the column names
-        data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')), names=col_names)
+        data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')))
 
-        # Convert the 'created_at' column to pandas datetime type
-        data_frame['created_at'] = pd.to_datetime(data_frame['created_at'])
-
-        # Extract date and time components from the 'created_at' column
-        data_frame['created_date'] = data_frame['created_at'].dt.date
-        data_frame['created_time'] = data_frame['created_at'].dt.time
-
-        # Split the last update datetime into separate date and time updated columns
-        data_frame['last_updated'] = pd.to_datetime(data_frame['last_updated'])
-        data_frame['last_updated_date'] = data_frame['last_updated'].dt.date
-        data_frame['last_updated_time'] = data_frame['last_updated'].dt.time
 
         # Drop the original datetime columns
         data_frame = data_frame.drop(columns=['created_at', 'last_updated'])
 
+        data_frame = data_frame.rename(columns={
+            'address_id': 'location_id',
+        })
+
         # Set the column data types
         data_frame = data_frame.astype({
-            "address_id": "int",
+            "location_id": "int",
             "address_line_1": "str",
             "address_line_2": "str",
             "district": "str",
@@ -70,11 +63,9 @@ def dim_address_data_frame(table_name):
             "postal_code": "str",
             "country": "str",
             "phone": "str",
-            "created_date": "str",
-            "created_time": "str",
-            "last_updated_date": "str",
-            "last_updated_time": "str"
         })
+
+        data_frame = data_frame.replace('nan','')
 
         # Return the final DataFrame
         return data_frame
