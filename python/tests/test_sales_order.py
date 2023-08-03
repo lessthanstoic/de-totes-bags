@@ -17,63 +17,86 @@ def create_mock_s3():
 
 # Test the sales_order_data_frame function
 def test_fact_sales_order_data_frame(create_mock_s3):
+
     result, date_result = fact_sales_order_data_frame('sales_order')
+
     assert isinstance(result, pd.DataFrame)
     assert isinstance(date_result, pd.DataFrame)
     # Check the number of rows
     assert result.shape[0] == 1 
 
-# Test if the fact_sales_order_data_frame return the right columns
-def test_fact_sales_order_data_frame_with_correct_columns(create_mock_s3):
-    result, date_result = fact_sales_order_data_frame('sales_order')
-    expect_sales = [ 'sales_record_id', 'sales_order_id', 'created_date', 'created_time', 'last_updated_date',
-                'last_updated_time', 'design_id', 'sales_staff_id', 'counterparty_id', 'units_sold',
-                'unit_price','currency_id', 'agreed_delivery_date', 'agreed_payment_date', 'agreed_delivery_location_id' 
-                ]
-    expect_date = ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter']
-
-    assert all(column in result.columns for column in expect_sales)
-    assert all(column in date_result.columns for column in expect_date)
-
-# Test if the fact_sales_order_data_frame return the right value
-def test_fact_sales_order_data_frame_values(create_mock_s3):
-    result, date_result = fact_sales_order_data_frame('sales_order')
-    expect_values = [[1,1,9,16,18,84754,2.43,3,'2022-11-10','2022-11-03',4,'2022-11-03','14:20:52','2022-11-03','14:20:52']]
-    assert result.values.tolist() == expect_values
-
 
 def test_sales_order_data_frame_invalid_table_name_type_error():
+    
     with pytest.raises(TypeError):
         # Non-string input
         fact_sales_order_data_frame(123)
     
 def test_sales_order_data_frame_file_not_found_error():
+    
     with pytest.raises(ValueError):
         fact_sales_order_data_frame('non_existent_file')
 
 # Test error for empty table name
 def test_sales_order_data_empty_table_name_error():
+    
     with pytest.raises(ValueError):
         fact_sales_order_data_frame('')
 
+# Test if the fact_sales_order_data_frame return the right columns
+def test_fact_sales_order_data_frame_with_correct_columns(create_mock_s3):
+
+    result, date_result = fact_sales_order_data_frame('sales_order')
+
+    expect_sales = [ 'sales_record_id', 'sales_order_id', 'created_date', 'created_time', 'last_updated_date',
+                'last_updated_time', 'design_id', 'sales_staff_id', 'counterparty_id', 'units_sold',
+                'unit_price','currency_id', 'agreed_delivery_date', 'agreed_payment_date', 'agreed_delivery_location_id' 
+                ]
+    
+    expect_date = ['date_id', 'year', 'month', 'day', 'day_of_week', 'day_name', 'month_name', 'quarter']
+
+    assert all(column in result.columns for column in expect_sales)
+    assert all(column in date_result.columns for column in expect_date)
+
+# Test if the fact_sales_order_data_frame return the right content
+def test_fact_sales_order_data_frame_values(create_mock_s3):
+
+    result, date_result = fact_sales_order_data_frame('sales_order')
+
+    expect_sales_content = [[1,1,9,16,18,84754,2.43,3,'2022-11-10','2022-11-03',4,'2022-11-03','14:20:52','2022-11-03','14:20:52']]
+    expect_date_content = [['2022-11-03',2022,11,3,3,'Thursday','November',4], ['2022-11-10',2022,11,10,3,'Thursday','November',4], ['2022-11-03',2022,11,3,3,'Thursday','November',4]]
+   
+    assert result.values.tolist() == expect_sales_content
+    assert sorted(date_result.values.tolist()) == sorted(expect_date_content)
+
 # Test the create_and_push_parquet function
 def test_create_and_push_parquet(create_mock_s3):
+    
     df = pd.DataFrame({'dummy': [1]})
+
     date_df = pd.DataFrame({'dummy': [2]})
+
     create_and_push_parquet(df, date_df, 'sales_order', 'dim_date')
+
     s3 = boto3.client('s3', region_name='eu-west-2')
+
     # Check if the file was created in the S3 bucket
     response1 = s3.get_object(Bucket='processed-data-vox-indicium', Key='sales_order.parquet')
     response2 = s3.get_object(Bucket='processed-data-vox-indicium', Key='dim_date.parquet')
+
     assert response1['ResponseMetadata']['HTTPStatusCode'] == 200
     assert response2['ResponseMetadata']['HTTPStatusCode'] == 200
 
 # Test the main function
 def test_main(create_mock_s3):
+
     main()
+
     # Check if the file was transferred in the final bucket
     s3 = boto3.client('s3', region_name='eu-west-2')
+
     response1 = s3.get_object(Bucket='processed-data-vox-indicium', Key='fact_sales_order.parquet')
     response2 = s3.get_object(Bucket='processed-data-vox-indicium', Key='dim_date.parquet')
+
     assert response1['ResponseMetadata']['HTTPStatusCode'] == 200
     assert response2['ResponseMetadata']['HTTPStatusCode'] == 200 
