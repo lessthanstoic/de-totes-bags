@@ -3,7 +3,7 @@ resource "aws_lambda_function" "s3_file_reader" {
   function_name = var.ingestion_lambda_name
   filename = data.archive_file.ingestion_lambda.output_path
   source_code_hash = data.archive_file.ingestion_lambda.output_base64sha256
-  role = aws_iam_role.iam_for_lambda.arn
+  role = aws_iam_role.iam_for_ingestion_lambda.arn
   handler = "src/postgres_data_capture.postgres_data_capture" # pythonfilename.functionname
   runtime = var.pythonversion
   timeout = 60
@@ -42,7 +42,7 @@ resource "aws_lambda_function" "data_transform" {
   function_name = var.transformation_lambda_name
   filename = data.archive_file.transform_lambda.output_path
   source_code_hash = data.archive_file.transform_lambda.output_base64sha256
-  role = aws_iam_role.iam_for_lambda.arn
+  role = aws_iam_role.iam_for_transformation_lambda.arn
   handler = "transform.lambda_handler" # pythonfilename.functionname
   runtime = var.pythonversion
 #   depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
@@ -59,7 +59,7 @@ resource "aws_lambda_function" "data_warehouse" {
   function_name = var.warehousing_lambda_name
   filename = data.archive_file.warehouse_lambda.output_path
   source_code_hash = data.archive_file.warehouse_lambda.output_base64sha256
-  role = aws_iam_role.iam_for_lambda.arn
+  role = aws_iam_role.iam_for_loading_lambda.arn
   handler = "warehouse.lambda_handler" # pythonfilename.functionname
   runtime = var.pythonversion
 #   depends_on = [ aws_cloudwatch_log_group.warehouse_lambda_log ]
