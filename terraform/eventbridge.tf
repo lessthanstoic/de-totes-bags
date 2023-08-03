@@ -84,7 +84,7 @@ resource "aws_cloudwatch_event_rule" "parquet_to_s3_lambda" {
       "eventSource": ["s3.amazonaws.com"],
       "eventName": ["PutObject"],
       "requestParameters": { 
-        "bucketName": [processed-data-vox-indicium"],
+        "bucketName": ["processed-data-vox-indicium"],
       "key": [{ "suffix": ".parquet" }]
       }
     }
