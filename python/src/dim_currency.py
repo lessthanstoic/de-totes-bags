@@ -97,7 +97,7 @@ def create_and_push_parquet(data_frame, new_table):
     Convert the DataFrames to a parquet format and push it to the processed s3 bucket.
     Arguments:
     data_frame - represent the DataFrame from of sales table the function dim_currency_data_frame.
-    table_name(string) - represents the name of a table in our database.
+    table_name(string) - represents the name of the final table from processed-data-vox-indicium s3 bucket.
     '''
     try:
        # Save DataFrame to a parquet file in memory
