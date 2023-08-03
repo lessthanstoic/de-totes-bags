@@ -1,9 +1,8 @@
 """
 This module reads .csv files from our ingestion bucket, and converts them to a pandas data frame.
-This module contains four functions:
+This module contains three functions:
 dim_counterparty_data_frame - reads the CSV files and returns a DataFrame.
-create_parquet - converts the DataFrame to a parquet file.
-push_parquet_file - push the parquet file in the process data bucket
+create_and_push_parquet - converts the DataFrame to a parquet file and push the parquet file in the process data bucket
 main - runs all functions to create the final parquet file.
 """
 

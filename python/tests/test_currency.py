@@ -39,10 +39,14 @@ def test_create_parquet_content(create_mock_s3):
         "currency_code": ["EUR"],
         "currency_name": ["Euro"]
     })
+
     create_and_push_parquet(expected_df, 'currency')
+
     s3 = boto3.client('s3', region_name='eu-west-2')
+
     # Check if the file was created in the S3 bucket 
     response = s3.get_object(Bucket='processed-data-vox-indicium', Key='currency.parquet')
+    
     parquet_file = response['Body'].read()
 
     # Write the retrieved content to a temporary file
@@ -58,8 +62,12 @@ def test_create_parquet_content(create_mock_s3):
 
 
 def test_main(create_mock_s3):
+
     main()
+
     # Verify if the file has been transferred to the final bucket
     s3 = boto3.client('s3', region_name='eu-west-2')
+
     response = s3.get_object(Bucket='processed-data-vox-indicium', Key='dim_currency.parquet')
+   
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
