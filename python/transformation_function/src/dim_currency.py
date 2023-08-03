@@ -148,5 +148,3 @@ def main():
 
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
-
-print(main())

@@ -45,32 +45,32 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
         address_file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=address_name)
 
         # Define the column names
-        counterparty_col_names = ["counterparty_id", 
-                                "counterparty_legal_name",
-                                "legal_address_id",
-                                "commercial_contact",
-                                "delivery_contact",
-                                "created_at",
-                                "last_updated"
-                                ]
-        address_col_names = ['address_id',
-                            'address_line_1', 
-                            'address_line_2', 
-                            'district', 
-                            'city', 
-                            'postal_code', 
-                            'country', 
-                            'phone', 
-                            'created_at', 
-                            'last_updated' 
-                            ]
+        # counterparty_col_names = ["counterparty_id", 
+        #                         "counterparty_legal_name",
+        #                         "legal_address_id",
+        #                         "commercial_contact",
+        #                         "delivery_contact",
+        #                         "created_at",
+        #                         "last_updated"
+        #                         ]
+        # address_col_names = ['address_id',
+        #                     'address_line_1', 
+        #                     'address_line_2', 
+        #                     'district', 
+        #                     'city', 
+        #                     'postal_code', 
+        #                     'country', 
+        #                     'phone', 
+        #                     'created_at', 
+        #                     'last_updated' 
+        #                     ]
         
         # Read the CSV file using the column names
-        counterparty_df = pd.read_csv(io.StringIO(counterparty_file['Body'].read().decode('utf-8')), names=counterparty_col_names)
-        address_df = pd.read_csv(io.StringIO(address_file['Body'].read().decode('utf-8')), names=address_col_names)
+        counterparty_df = pd.read_csv(io.StringIO(counterparty_file['Body'].read().decode('utf-8')))
+        address_df = pd.read_csv(io.StringIO(address_file['Body'].read().decode('utf-8')))
 
         merged_df = pd.merge(counterparty_df, address_df, left_on='legal_address_id', right_on='address_id', suffixes=('', '_address'))
-
+    
         # Rename and reorder the columns 
         data_frame = merged_df.rename(columns={
             'counterparty_legal_name': 'counterparty_legal_name',
@@ -104,6 +104,7 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
             "counterparty_legal_phone_number": "str"
         })
         
+        data_frame = data_frame.replace('nan','')
         # Return the final DataFrame
         return data_frame
     

@@ -163,7 +163,7 @@ def fact_sales_order_data_frame(sales_order_table):
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
 
-def create_and_push_parquet(data_frame, date_df, sales_order_table, dim_date):
+def create_and_push_parquet(data_frame, file_name):
     '''
     Convert the DataFrames to a parquet format and push it to the processed s3 bucket.
     Arguments:
@@ -177,14 +177,10 @@ def create_and_push_parquet(data_frame, date_df, sales_order_table, dim_date):
         parquet_buffer = io.BytesIO()
         data_frame.to_parquet(parquet_buffer, engine='pyarrow')
 
-        parquet_buffer2 = io.BytesIO()
-        date_df.to_parquet(parquet_buffer2, engine='pyarrow')
-
         s3 = boto3.client('s3')
-        s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{sales_order_table}.parquet', Body=parquet_buffer.getvalue())
-        s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{dim_date}.parquet', Body=parquet_buffer.getvalue())
-
-        print(f"Parquet files '{sales_order_table}.parquet' and '{dim_date}.parquet'created and stored in S3 bucket 'processed-data-vox-indicium'.")
+        s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{file_name}.parquet', Body=parquet_buffer.getvalue())
+    
+        return f"Parquet file '{file_name}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'."
         
     except Exception as e:
         # Generic exception for unexpected errors during conversion
