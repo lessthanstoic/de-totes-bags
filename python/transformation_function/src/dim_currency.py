@@ -5,12 +5,15 @@ dim_currency_data_frame - reads the CSV file and returns a DataFrame.
 create_parquet - converts the DataFrame to a parquet file.
 push_parquet_file - copies the parquet file from one Amazon S3 bucket to another and then deletes the original.
 main - runs both functions to create and transfer the final parquet file.
+FYI: ccy-1.3.1-py3-none-any.whl
 """
 import boto3
 import pandas as pd
 import io
 import os
+import ccy
 from botocore.exceptions import (EndpointConnectionError, NoCredentialsError, ClientError)
+from pprint import pprint
 
 def dim_currency_data_frame(table_name):
     """
@@ -38,34 +41,31 @@ def dim_currency_data_frame(table_name):
         file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=file_name)
 
         # Define the column names
-        col_names = ["currency_id",
-                     "currency_code",
-                     "created_at",
-                     "last_updated"
-                     ]
+        # col_names = ["currency_id",
+        #              "currency_code",
+        #              "created_at",
+        #              "last_updated"
+        #              ]
 
         # Read the CSV file using the column names
-        data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')), names=col_names)
+        data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')))
 
-        # Split the create datetime column into separate date and time columns
-        data_frame[['created_date', 'time']] = data_frame['created_at'].str.split(' ', expand=True)
-        data_frame[['created_time', 't']] = data_frame['time'].str.split('.', expand=True)
-
-        # Split the last update datetime into separate date and time updated columns
-        data_frame[['last_updated_date', 'ltime']] = data_frame['last_updated'].str.split(' ', expand=True)
-        data_frame[['last_updated_time', 'lt']] = data_frame['ltime'].str.split('.', expand=True)
 
         # Drop the original datetime columns
-        data_frame = data_frame.drop(columns=['created_at', 'last_updated', 'time', 'ltime', 't', 'lt'])
+        data_frame = data_frame.drop(columns=['created_at', 'last_updated'])
 
+        # Populate dataframe with currency name
+        currency_code_list = list(data_frame['currency_code'])
+
+        currency_name_list = [ccy.currency(currency_code).__dict__['name'] for currency_code in currency_code_list]
+        data_frame = data_frame.assign(currency_name=currency_name_list) 
+
+   
         # Set the column data types
         data_frame = data_frame.astype({
             "currency_id": "int",
             "currency_code": "str",
-            "created_date": "str",
-            "created_time": "str",
-            "last_updated_date": "str",
-            "last_updated_time": "str"
+            "currency_name": "str"
         })
 
         # Return the final DataFrame
