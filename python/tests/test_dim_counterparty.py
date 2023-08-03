@@ -37,7 +37,21 @@ def test_dim_counterparty_data_frame_empty_table_name_error():
     with pytest.raises(ValueError):
         dim_counterparty_data_frame('', 'address')
 
-def test_parquet_content(create_mock_s3):
+# Test the create_and_push_parquet function
+def test_if_the_parquet_file_was_created_in_the_process_bucket(create_mock_s3):
+
+    df = pd.DataFrame({'dummy': [1]})
+
+    create_and_push_parquet(df, 'dim_counterparty')
+
+    s3 = boto3.client('s3', region_name='eu-west-2')
+
+    # Check if the file was created in the S3 bucket
+    response = s3.get_object(Bucket='processed-data-vox-indicium', Key='dim_counterparty.parquet')
+    
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
+
+def test_parquet_content_from_process_bucket(create_mock_s3):
     # Create expected DataFrame
     expected_df = pd.DataFrame({
         "counterparty_id": [1],
@@ -69,14 +83,6 @@ def test_parquet_content(create_mock_s3):
     # Compare both DataFrames
     pd.testing.assert_frame_equal(expected_df, read_parquet)
 
-# Test the create_and_push_parquet function
-def test_create_and_push_parquet(create_mock_s3):
-    df = pd.DataFrame({'dummy': [1]})
-    create_and_push_parquet(df, 'dim_counterparty')
-    s3 = boto3.client('s3', region_name='eu-west-2')
-    # Check if the file was created in the S3 bucket
-    response = s3.get_object(Bucket='processed-data-vox-indicium', Key='dim_counterparty.parquet')
-    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 # Test the main function
 def test_main(create_mock_s3):

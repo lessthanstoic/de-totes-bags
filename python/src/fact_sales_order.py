@@ -146,7 +146,11 @@ def fact_sales_order_data_frame(sales_order_table):
             'day_name': 'str',
             'month_name': 'str',
             'quarter': 'int'
-        })   
+        })  
+
+        # Sorted the date frame
+        data_frame.sort_values(by='sales_record_id', inplace=True)
+        date_df.sort_values(by='date_id', inplace=True)  
 
         # Return the final DataFrames
         return data_frame, date_df

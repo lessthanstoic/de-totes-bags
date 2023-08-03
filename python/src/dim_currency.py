@@ -67,6 +67,9 @@ def dim_currency_data_frame(currency_table):
             "currency_name": "str"
         })
 
+        # Sorted the date frame
+        data_frame.sort_values(by='currency_id', inplace=True)
+
         # Return the final DataFrame
         return data_frame
 

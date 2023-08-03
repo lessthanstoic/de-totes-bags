@@ -67,8 +67,8 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
                             ]
         
         # Read the CSV files using the column names
-        counterparty_df = pd.read_csv(io.StringIO(counterparty_file['Body'].read().decode('utf-8')), names=counterparty_col_names, header=None)
-        address_df = pd.read_csv(io.StringIO(address_file['Body'].read().decode('utf-8')), names=address_col_names, header=None)
+        counterparty_df = pd.read_csv(io.StringIO(counterparty_file['Body'].read().decode('utf-8')), names=counterparty_col_names)
+        address_df = pd.read_csv(io.StringIO(address_file['Body'].read().decode('utf-8')), names=address_col_names)
 
         # Merge counterparty_df and address_df DataFrames on matching 'legal_address_id' and 'address_id', retaining distinct suffixes for overlapping columns
         merged_df = pd.merge(counterparty_df, address_df, left_on='legal_address_id', right_on='address_id', suffixes=('', '_address'))
@@ -108,6 +108,8 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
             "counterparty_legal_country": "str",
             "counterparty_legal_phone_number": "str"
         })
+        # Sorted the date frame
+        data_frame.sort_values(by='counterparty_id', inplace=True)
         
         # Return the final DataFrame
         return data_frame

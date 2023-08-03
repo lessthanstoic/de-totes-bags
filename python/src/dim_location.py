@@ -65,6 +65,9 @@ def dim_address_data_frame(address_table):
             "phone": "str"           
         })
 
+        # Sorted the date frame
+        data_frame.sort_values(by='location_id', inplace=True)
+
         # Return the final DataFrame
         return data_frame
 

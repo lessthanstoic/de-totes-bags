@@ -62,6 +62,9 @@ def dim_design_table_data_frame(design_table):
             'file_name': 'str'
             })
         
+        # Sorted the date frame
+        data_frame.sort_values(by='design_id', inplace=True)
+        
         # Return the final DataFrame
         return data_frame
     
