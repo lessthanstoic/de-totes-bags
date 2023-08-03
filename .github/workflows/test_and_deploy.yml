@@ -81,6 +81,8 @@ jobs:
       - name: Terraform plan
         working-directory: terraform
         run: terraform plan
+        env: 
+          TF_VAR_my_email_alerts: ${{secrets.AWS_ALERT_EMAIL}}
 
       - name: Terraform apply
         working-directory: terraform
