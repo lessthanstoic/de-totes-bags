@@ -2,7 +2,8 @@
 Example Usage:
 
 # Retrieve secret details using the secret name or ARN
-secret_name = "my-secret-name"  # Replace this with the actual secret name or ARN
+secret_name = "my-secret-name"
+# Replace this with the actual secret name or ARN
 secret_details = retrieve_secret_details(secret_name)
 
 # Now you can access the secret data using the dictionary keys
@@ -20,13 +21,16 @@ def retrieve_secret_details(secret_name):
     Retrieve the secret details from AWS Secrets Manager.
 
     Parameters:
-        secret_name (str): The name or ARN of the secret to retrieve.
+        secret_name (str):
+            The name or ARN of the secret to retrieve.
 
     Returns:
-        dict: A dictionary containing the secret data retrieved from AWS Secrets Manager.
+        dict: A dictionary containing the secret
+            data retrieved from AWS Secrets Manager.
 
     Raises:
-        botocore.exceptions.ClientError: If there is an error while retrieving the secret.
+        botocore.exceptions.ClientError:
+            If there is an error while retrieving the secret.
     """
     # Create a Secrets Manager client
     region_name = "eu-west-2"
