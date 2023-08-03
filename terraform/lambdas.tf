@@ -59,7 +59,7 @@ resource "aws_lambda_function" "data_warehouse" {
   function_name = var.warehousing_lambda_name
   filename = data.archive_file.warehouse_lambda.output_path
   source_code_hash = data.archive_file.warehouse_lambda.output_base64sha256
-  role = aws_iam_role.iam_for_loading_lambda.arn
+  role = aws_iam_role.iam_for_warehousing_lambda.arn
   handler = "warehouse.lambda_handler" # pythonfilename.functionname
   runtime = var.pythonversion
 #   depends_on = [ aws_cloudwatch_log_group.warehouse_lambda_log ]
