@@ -1,13 +1,13 @@
-from python.loading.src.load_utils import (
+from python.loading_function.src.load_utils import (
     getDataFrameFromS3Parquet,
     list_parquet_files_in_bucket,
     has_lambda_been_called)
-from python.loading.src.sql_utils import (
+from python.loading_function.src.sql_utils import (
     copy_from_file,
     update_from_file,
     get_table_primary_key
 )
-from python.loading.src.secret_login import retrieve_secret_details
+from python.loading_function.src.secret_login import retrieve_secret_details
 from botocore.exceptions import ClientError
 
 import psycopg2
