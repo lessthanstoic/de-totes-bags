@@ -44,9 +44,9 @@ def push_data_in_bucket(event, context):
             user=db_login_deets['username'],
             password=db_login_deets['password']
         )
-        logger.info('Connected to Totesys database...')
+        logger.info('Connected to Totesys warehouse...')
     except psycopg2.Error as e:
-        logger.error('Unable to connect to the database:', e)
+        logger.error('Unable to connect to the warehouse:', e)
         raise e
 
     # If the lambda has been called before we only want to update
@@ -60,11 +60,13 @@ def push_data_in_bucket(event, context):
             table_name = file.split(".")[0]
             primary_keys_list = get_table_primary_key(connection, table_name)
             update_from_file(connection, df, table_name, primary_keys_list)
+            logger.info('Updating Totesys warehouse...')
     else:
         pq_files = list_parquet_files_in_bucket()
         for file in pq_files:
             df = getDataFrameFromS3Parquet(bucket_name, file)
             table_name = file.split(".")[0]
             copy_from_file(connection, df, table_name)
+            logger.error('Initializing Totesys warehouse:', e)
 
     connection.close()
