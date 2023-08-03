@@ -2,7 +2,7 @@
 resource "aws_lambda_function" "s3_file_reader" {
   function_name = var.ingestion_lambda_name
   filename = data.archive_file.ingestion_lambda.output_path
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+  source_code_hash = data.archive_file.ingestion_lambda.output_base64sha256
   role = aws_iam_role.iam_for_lambda.arn
   handler = "src/postgres_data_capture.postgres_data_capture" # pythonfilename.functionname
   runtime = var.pythonversion

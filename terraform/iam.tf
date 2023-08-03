@@ -78,6 +78,29 @@ resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
     policy_arn = aws_iam_policy.cw_policy.arn
 }
 
+# Unfortunately we need another policy, even if identical
+# https://github.com/hashicorp/terraform/issues/11873
+data "aws_iam_policy_document" "another_cw_document" {
+  statement {
+
+    actions = [ "logs:CreateLogGroup" ]
+
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
+
+  statement {
+
+    actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
+
+    resources = [
+      # I presume this works for all lambdas now?
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
+}
+
 # attach the cloudwatch policy created above to the lambda IAM role
 resource "aws_iam_role_policy_attachment" "transformation_lambda_cw_policy_attachment" {
     role = aws_iam_role.iam_for_transformation_lambda.name
@@ -87,7 +110,7 @@ resource "aws_iam_role_policy_attachment" "transformation_lambda_cw_policy_attac
 # attach the cloudwatch policy created above to the lambda IAM role
 resource "aws_iam_role_policy_attachment" "warehousing_lambda_cw_policy_attachment" {
     role = aws_iam_role.iam_for_warehousing_lambda.name
-    policy_arn = aws_iam_policy_document.cw_document.arn
+    policy_arn = aws_iam_policy_document.another_cw_document.arn
 }
 
 resource "aws_iam_policy" "cw_policy" {
