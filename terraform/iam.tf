@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "assume_role" {
 
 
 # provides an IAM role for the lambda and attaches the above policy, so it can use the credentials
-resource "aws_iam_role" "iam_for_lambda" {
+resource "aws_iam_role" "iam_for_ingestion_lambda" {
   name               = "role-${var.ingestion_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
@@ -72,12 +72,6 @@ data "aws_iam_policy_document" "cw_document" {
   }
 }
 
-# attach the cloudwatch policy created above to the lambda IAM role
-resource "aws_iam_role_policy_attachment" "lambda_cw_policy_attachment" {
-    role = aws_iam_role.iam_for_lambda.name
-    policy_arn = aws_iam_policy.cw_policy.arn
-}
-
 # Unfortunately we need another policy, even if identical
 # https://github.com/hashicorp/terraform/issues/11873
 data "aws_iam_policy_document" "another_cw_document" {
@@ -101,22 +95,63 @@ data "aws_iam_policy_document" "another_cw_document" {
   }
 }
 
+# Unfortunately we need another policy, even if identical
+# https://github.com/hashicorp/terraform/issues/11873
+data "aws_iam_policy_document" "athird_cw_document" {
+  statement {
+
+    actions = [ "logs:CreateLogGroup" ]
+
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
+
+  statement {
+
+    actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
+
+    resources = [
+      # I presume this works for all lambdas now?
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ingestion_cw_policy" {
+  name        = "cloudwatch-log-policy"
+  description = "A policy to give ingestion lambda permissions to log to cloudwatch"
+  policy      = data.aws_iam_policy_document.cw_document.json
+}
+
+resource "aws_iam_policy" "transformation_cw_policy" {
+  name        = "cloudwatch-log-policy"
+  description = "A policy to give ingestion lambda permissions to log to cloudwatch"
+  policy      = data.aws_iam_policy_document.another_cw_document.json
+}
+
+resource "aws_iam_policy" "loading_cw_policy" {
+  name        = "cloudwatch-log-policy"
+  description = "A policy to give ingestion lambda permissions to log to cloudwatch"
+  policy      = data.aws_iam_policy_document.athird_cw_document.json
+}
+
+# attach the cloudwatch policy created above to the lambda IAM role
+resource "aws_iam_role_policy_attachment" "ingestion_lambda_cw_policy_attachment" {
+    role = aws_iam_role.iam_for_ingestion_lambda.name
+    policy_arn = aws_iam_policy.ingestion_cw_policy.arn
+}
+
 # attach the cloudwatch policy created above to the lambda IAM role
 resource "aws_iam_role_policy_attachment" "transformation_lambda_cw_policy_attachment" {
     role = aws_iam_role.iam_for_transformation_lambda.name
-    policy_arn = aws_iam_policy_document.cw_document.arn
+    policy_arn = aws_iam_policy.transformation_cw_policy.arn
 }
 
 # attach the cloudwatch policy created above to the lambda IAM role
 resource "aws_iam_role_policy_attachment" "warehousing_lambda_cw_policy_attachment" {
     role = aws_iam_role.iam_for_warehousing_lambda.name
-    policy_arn = aws_iam_policy_document.another_cw_document.arn
-}
-
-resource "aws_iam_policy" "cw_policy" {
-  name        = "cloudwatch-log-policy"
-  description = "A policy to give ingestion lambda permissions to log to cloudwatch"
-  policy      = data.aws_iam_policy_document.cw_document.json
+    policy_arn = aws_iam_policy.loading_cw_policy.arn
 }
 
 
