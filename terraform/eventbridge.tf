@@ -62,7 +62,7 @@ resource "aws_cloudwatch_event_target" "transform_lambda_target" {
 
 
 resource "aws_lambda_permission" "allow_trans_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge"
+  statement_id  = "AllowExecutionFromEventBridgeTrans"
   action        = "lambda:InvokeFunction"
   function_name = var.transformation_lambda_name
   principal     = "events.amazonaws.com"
@@ -101,7 +101,7 @@ resource "aws_cloudwatch_event_target" "warehouse_lambda_target" {
 
 
 resource "aws_lambda_permission" "allow_warehouse_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge"
+  statement_id  = "AllowExecutionFromEventBridgeLoad"
   action        = "lambda:InvokeFunction"
   function_name = var.warehousing_lambda_name
   principal     = "events.amazonaws.com"
