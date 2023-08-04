@@ -48,7 +48,7 @@ resource "aws_lambda_function" "data_transform" {
   filename = data.archive_file.transform_lambda.output_path
   source_code_hash = data.archive_file.transform_lambda.output_base64sha256
   role = aws_iam_role.iam_for_transformation_lambda.arn
-  handler = "transform.lambda_handler" # pythonfilename.functionname
+  handler = "src/transformation_function.transformation_function" # pythonfilename.functionname
   runtime = var.pythonversion
   depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
 }
@@ -65,7 +65,7 @@ resource "aws_lambda_function" "data_warehouse" {
   filename = data.archive_file.warehouse_lambda.output_path
   source_code_hash = data.archive_file.warehouse_lambda.output_base64sha256
   role = aws_iam_role.iam_for_warehousing_lambda.arn
-  handler = "warehouse.lambda_handler" # pythonfilename.functionname
+  handler = "src/update_datawarehouse.push_data_in_bucket" # pythonfilename.functionname
   runtime = var.pythonversion
   layers = [aws_lambda_layer_version.lambda_layer.arn, 
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3", 

@@ -84,8 +84,27 @@ jobs:
         env: 
           TF_VAR_my_email_alerts: ${{secrets.AWS_ALERT_EMAIL}}
 
+      - name: Terraform destroy
+        working-directory: terraform
+        run: terraform destroy
+
+      - name: Terraform init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform plan
+        working-directory: terraform
+        run: terraform plan
+        env: 
+          TF_VAR_my_email_alerts: ${{secrets.AWS_ALERT_EMAIL}}
+          
       - name: Terraform apply
         working-directory: terraform
         run: terraform apply -refresh-only -auto-approve
         env: 
           TF_VAR_my_email_alerts: ${{secrets.AWS_ALERT_EMAIL}}
+      # - name: Terraform apply
+      #   working-directory: terraform
+      #   run: terraform apply -refresh-only -auto-approve
+      #   env: 
+      #     TF_VAR_my_email_alerts: ${{secrets.AWS_ALERT_EMAIL}}
