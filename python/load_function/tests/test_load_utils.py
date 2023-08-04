@@ -1,4 +1,4 @@
-from python.loading.src.load_utils import (
+from python.load_function.src.load_utils import (
     getFileFromS3,
     readParquetFromBytesObject,
     getDataFrameFromS3Parquet,
@@ -14,7 +14,7 @@ def create_mock_s3():
     mock_client.create_bucket(Bucket='processed-data-vox-indicium',
                               CreateBucketConfiguration={
                                   'LocationConstraint': 'eu-west-2', })
-    with open('python/loading/tests/fact_sales.parquet', 'rb') as data:
+    with open('python/load_function/tests/fact_sales.parquet', 'rb') as data:
         mock_client.put_object(Bucket='processed-data-vox-indicium',
                                Body=data,
                                Key='fact_sales.parquet')
@@ -53,7 +53,7 @@ def create_mock_s3_with_multiple_objects():
     mock_client.create_bucket(Bucket='processed-data-vox-indicium',
                               CreateBucketConfiguration={
                                   'LocationConstraint': 'eu-west-2', })
-    with open('python/loading/tests/fact_sales.parquet', 'rb') as data:
+    with open('python/load_function/tests/fact_sales.parquet', 'rb') as data:
         mock_client.put_object(Bucket='processed-data-vox-indicium',
                                Body=data,
                                Key='fact_sales.parquet')

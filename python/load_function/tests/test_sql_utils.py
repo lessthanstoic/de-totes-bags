@@ -1,4 +1,4 @@
-from python.loading.src.sql_utils import (
+from python.load_function.src.sql_utils import (
     copy_from_file,
     copy_from_stringio,
     get_table_primary_key)
@@ -13,7 +13,7 @@ def test_insert_data_from_file(mock_connect):
     mock_conn = mock_connect.return_value
     # mock_cursor = mock_conn.cursor.return_value
 
-    df = pd.read_csv("python/loading/tests/sales_order.csv")
+    df = pd.read_csv("python/load_function/tests/sales_order.csv")
 
     # ACT
     # Call the function being tested
@@ -32,7 +32,7 @@ def test_insert_data_from_stream(mock_connect):
     mock_conn = mock_connect.return_value
     # mock_cursor = mock_conn.cursor.return_value
 
-    df = pd.read_csv("python/loading/tests/sales_order.csv")
+    df = pd.read_csv("python/load_function/tests/sales_order.csv")
 
     # ACT
     # Call the function being tested

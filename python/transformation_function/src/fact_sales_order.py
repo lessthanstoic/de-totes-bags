@@ -2,9 +2,12 @@
 This module reads .csv files from our ingestion bucket, and converts them to a pandas data frame.
 This module contains four functions:
 fact_sales_order_data_frame - reads the CSV file and returns a DataFrame.
-create_parquet - converts the DataFrame to a parquet file.
-push_parquet_file - push the parquet file in the process data bucket
-main - runs all functions to create the final parquet file.
+Errors:
+    TypeError - if input is not a string
+    ValueError - Catching the specific ValueError
+    ClientError - Catch the error if the table name is non-existent
+    FileNotFoundError - if the file was not found
+    Exception - for general errors
 """
 import boto3
 import pandas as pd
@@ -173,17 +176,21 @@ def fact_sales_order_data_frame(sales_order_table):
     except ValueError as e:
         # Catching the specific ValueError before the generic Exception
         raise e
+    
     except ClientError as e:
         # Catch the error if the table name is non-existent
         if e.response['Error']['Code'] == 'NoSuchKey':
             raise ValueError(f"The file {sales_order_table} does not exist")
         else:
             raise e
+        
     except TypeError as e:
        #catches the error if the user tap an incorrect input
         raise e
+    
     except FileNotFoundError:
         raise FileNotFoundError(f"The file {file_name} does not exist locally")
+    
     except Exception as e:
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
@@ -202,9 +209,13 @@ def create_and_push_parquet(data_frame, file_name):
         parquet_buffer = io.BytesIO()
         data_frame.to_parquet(parquet_buffer, engine='pyarrow')
 
+        # Connect to S3 client
         s3 = boto3.client('s3')
+
+        # Send the parquet files to processed-data-vox-indicium s3 bouquet
         s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{file_name}.parquet', Body=parquet_buffer.getvalue())
     
+        # Print a confirmation message
         logger.info(f"Parquet file '{file_name}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
         return f"Parquet file '{file_name}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'."
         
@@ -212,44 +223,24 @@ def create_and_push_parquet(data_frame, file_name):
         # Generic exception for unexpected errors during conversion
         raise Exception(f"An error occurred while converting to parquet: {e}")
     
-
-"""    
-def push_parquet_file(sales_order_table):
-    '''
-    Function to copy a Parquet file from one Amazon S3 bucket to another, then delete the original.
-    param table_name: Name of the table (without extension) to be transferred.
-    '''
-    try:
-        s3 = boto3.client('s3')
-        s3_resource = boto3.resource('s3')
-
-        # Copy the parquet file
-        copy_source = {
-            'Bucket': 'ingested-data-vox-indicium',
-            'Key': f'{sales_order_table}.parquet'
-        }
-
-        s3_resource.meta.client.copy(copy_source, 'processed-data-vox-indicium', f'{sales_order_table}.parquet')
-
-        # Delete the original parquet file
-        s3.delete_object(Bucket='ingested-data-vox-indicium', Key=f'{sales_order_table}.parquet')
-
-        print(f"Parquet file '{sales_order_table}.parquet' transferred to S3 bucket 'processed-data-vox-indicium'.")
-    except Exception as e:
-        raise Exception(f"An error occurred while transferring the parquet file: {e}")
-""" 
-
-
 def main():
     '''
     Runs both functions to create and transfer the final parquet file.
     '''
     try:
+        # Table name for the tables used in the function fact_sales_order_data_frame
         sales_order_table = 'sales_order'
+
+        # The name of the parquet file
+        fact_sales_order = "fact_sales_order"
         dim_date = "dim_date"
+
+        # Call the fact_sales_order_data_frame function
         sales_df, date_df = fact_sales_order_data_frame(sales_order_table)
 
-        create_and_push_parquet(sales_df, date_df, sales_order_table, dim_date)
+        #Call the create_and_push_parquet function
+        create_and_push_parquet(sales_df, date_df, fact_sales_order, dim_date)
 
+    # Generic exception for unexpected errors during the running of the functions
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
