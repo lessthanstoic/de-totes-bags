@@ -7,7 +7,7 @@ from python.transformation_function.src.fact_sales_order import fact_sales_order
 from python.transformation_function.src.dim_date_transformation import dim_date_transformation
 from python.transformation_function.src.dim_staff import dim_staff_data_frame
 
-
+import boto3
 from pprint import pprint
 import logging
 
@@ -62,5 +62,12 @@ def transformation_function(event, context):
         staff_df = dim_staff_data_frame("staff_changes", "department")
         staff_parquet = create_and_push_parquet(staff_df, "dim_staff")
         pprint(staff_parquet)
+    except Exception as e:
+        logger.error(e)
+
+    try:
+        s3 = boto3.client('s3')
+        s3.put_object(Bucket='processed-data-vox-indicium', Key="event-trigger.txt", Body="load lambda run")
+        logger.info("Transformation lambda completed, text file trigger sent")
     except Exception as e:
         logger.error(e)
