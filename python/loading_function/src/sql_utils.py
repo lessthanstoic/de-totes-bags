@@ -21,7 +21,8 @@ def copy_from_file(conn, df, table):
     """
     # Save the dataframe to disk
     tmp_df = "./tmp_dataframe.csv"
-    df.to_csv(tmp_df, index_label='id', header=False)
+    df.to_csv(tmp_df, index=False, header=False)
+
     f = open(tmp_df, 'r')
     cursor = conn.cursor()
     try:
@@ -82,26 +83,17 @@ def update_from_file(conn, df, table, primary_keys_list):
     # primary_keys_list = get_table_primary_key(conn, table)
     primary_keys = ', '.join(primary_keys_list)
     columns = df.columns.tolist()
+    update_columns = [x for x in columns if x not in primary_keys_list]
     column_names = ', '.join(columns)
-    # value_placeholders = ', '.join(['%s'] * len(columns))
-    # print( value_placeholders )
+    update_columns_names = ", ".join(update_columns)
     primary_keys_excluded = ["EXCLUDED." + x.strip()
-                             for x in primary_keys_list]
+                             for x in update_columns]
     excluded = ', '.join(primary_keys_excluded)
-    # Define the SQL query for INSERT
-    # This query should mimic a MERGE
-    # ala https://www.postgresql.org/docs/current/sql-insert.html
-    # merge_query = f"""
-    #     INSERT INTO {table} ({column_names})
-    #     VALUES ({value_placeholders})
-    #     ON CONFLICT ({primary_keys})
-    #     DO UPDATE SET ({primary_keys}) = ({excluded});
-    # """
     merge_query = f"""
         INSERT INTO {table} ({column_names})
         VALUES %s
         ON CONFLICT ({primary_keys})
-        DO UPDATE SET ({primary_keys}) = ({excluded});
+        DO UPDATE SET ({update_columns_names}) = ({excluded});
     """
     cursor = conn.cursor()
     try:
