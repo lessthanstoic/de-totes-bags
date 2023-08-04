@@ -50,6 +50,7 @@ data "aws_iam_policy_document" "loading_assume_role" {
 resource "aws_iam_role" "iam_for_ingestion_lambda" {
   name               = "role-${var.ingestion_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.ingestion_assume_role.json
+  force_detach_policies = true
 }
 
 
