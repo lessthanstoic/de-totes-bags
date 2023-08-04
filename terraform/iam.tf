@@ -221,6 +221,28 @@ resource "aws_iam_policy" "s3_write_policy" {
     }
 
 
+resource "aws_iam_policy" "s3_trans_write_policy" {
+  name = "s3-write-to-transformation-bucket-policy"
+  description = "A policy to give ingestion lambda permissions to write to S3 bucket"
+
+
+  policy = <<EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+    {
+        "Effect": "Allow",
+        "Action": [
+            "s3:*"
+        ],
+        "Resource": "arn:aws:s3:::${var.processed_bucket_name}/*"
+    }
+]
+
+}
+    EOF
+    }
+
 
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment" {
     role = aws_iam_role.iam_for_ingestion_lambda.name
@@ -230,5 +252,5 @@ resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment" {
 
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment_transformation" {
     role = aws_iam_role.iam_for_transformation_lambda.name
-    policy_arn = aws_iam_policy.s3_write_policy.arn
+    policy_arn = aws_iam_policy.s3_trans_write_policy.arn
 }
