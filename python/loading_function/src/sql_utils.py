@@ -123,7 +123,7 @@ def get_table_primary_key(conn, table):
         cursor.execute(query)
         query_results = cursor.fetchall()
         primary_keys = [row[0] for row in query_results]
-    except (Exception, psycopg2.DatabaseError) as e:
+    except (Exception, psycopg2.DatabaseError):
         logger.error("Error: database error")
         conn.rollback()
         cursor.close()

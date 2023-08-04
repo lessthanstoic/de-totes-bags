@@ -63,9 +63,8 @@ def getDataFrameFromS3Parquet(bucket_name, file_name):
         from the Parquet file.
     """
     try:
-    # Connect to the s3
+        # Connect to the s3
         s3 = boto3.client('s3')
-
         # Get the object with the input file_name from the S3 bucket
         file = s3.get_object(Bucket=bucket_name, Key=file_name)
         par = file['Body']
@@ -90,19 +89,18 @@ def getFileFromS3(bucket_name, file_name):
         tuple: A tuple containing the file contents (bytes) and the
         HTTP status code of the response.
     """
-    try: 
-    # Connect to the S3 service
+    try:
+        # Connect to the S3 service
         s3 = boto3.client('s3')
         # Get the object with the input file_name from the S3 bucket
         file = s3.get_object(Bucket=bucket_name, Key=file_name)
-        # Return the file contents (bytes) and the HTTP status code of the response
+        # Return the file contents (bytes) and the HTTP status
+        # code of the response
         return file['Body'].read(), file['ResponseMetadata']['HTTPStatusCode']
-    
     except ClientError as e:
         logger.error("Client error", e)
     except TypeError:
         raise TypeError("Function must take a string input")
-
 
 
 def readParquetFromBytesObject(file):
@@ -142,7 +140,6 @@ def list_parquet_files_in_bucket(bucket_name):
         # Extract the keys (file names) of objects that end with '.parquet'
         return [file['Key'] for file in files['Contents']
                 if file['Key'].endswith('.parquet')]
-    
     except ClientError as e:
         logger.error("Client error", e)
 
