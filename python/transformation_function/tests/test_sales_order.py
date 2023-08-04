@@ -11,14 +11,24 @@ from python.transformation_function.src.fact_sales_order import (
 def create_mock_s3():
     with mock_s3():
         s3 = boto3.client('s3', region_name='eu-west-2')
-        s3.create_bucket(Bucket='ingested-data-vox-indicium',
-                         CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
-        s3.create_bucket(Bucket='processed-data-vox-indicium',
-                         CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
-        csv_data = "sales_order_id,created_at,last_updated,design_id,staff_id,counterparty_id,units_sold,unit_price,currency_id,agreed_delivery_date,agreed_payment_date,agreed_delivery_location_id\n1,2022-11-03 14:20:52.186000,2022-11-03 14:20:52.186000,9,16,18,84754,2.43,3,2022-11-10,2022-11-03,4\n"
+        s3.create_bucket(
+            Bucket='ingested-data-vox-indicium',
+            CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
+        s3.create_bucket(
+            Bucket='processed-data-vox-indicium',
+            CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
+        csv_data = (
+            "sales_order_id,created_at,last_updated,"
+            "design_id,staff_id,counterparty_id,units_sold,"
+            "unit_price,currency_id,agreed_delivery_date,"
+            "agreed_payment_date,agreed_delivery_location_id\n"
+            "1,2022-11-03 14:20:52.186000,2022-11-03 14:20:52.186000,"
+            "9,16,18,84754,2.43,3,2022-11-10,2022-11-03,4\n"
+        )
         s3.put_object(Bucket='ingested-data-vox-indicium',
                       Key='sales_order.csv', Body=csv_data)
         yield
+
 # Test the sales_order_data_frame function
 
 
@@ -49,18 +59,25 @@ def test_sales_order_data_empty_table_name_error():
 
 def test_fact_sales_order_data_frame_with_correct_columns(create_mock_s3):
     result = fact_sales_order_data_frame('sales_order')
-    expect_sales = ['sales_record_id', 'sales_order_id', 'created_date', 'created_time', 'last_updated_date',
-                    'last_updated_time', 'design_id', 'sales_staff_id', 'counterparty_id', 'units_sold',
-                    'unit_price', 'currency_id', 'agreed_delivery_date', 'agreed_payment_date', 'agreed_delivery_location_id'
-                    ]
+    expect_sales = ['sales_record_id', 'sales_order_id', 'created_date',
+                    'created_time', 'last_updated_date', 'last_updated_time',
+                    'design_id', 'sales_staff_id', 'counterparty_id',
+                    'units_sold', 'unit_price', 'currency_id',
+                    'agreed_delivery_date', 'agreed_payment_date',
+                    'agreed_delivery_location_id']
     assert all(column in result.columns for column in expect_sales)
 # Test if the fact_sales_order_data_frame return the right content
 
 
 def test_fact_sales_order_data_frame_values(create_mock_s3):
     result = fact_sales_order_data_frame('sales_order')
-    print( result.values.tolist())
-    expect_sales_content = [[1, 1, '2022-11-03', '14:20:52.186000', '2022-11-03', '14:20:52.186000', 16, 18, 84754, 2.43, 3, 9, '2022-11-03', '2022-11-10', 4]]
+    print(result.values.tolist())
+    expect_sales_content = [
+        [1, 1, '2022-11-03', '14:20:52.186000',
+         '2022-11-03', '14:20:52.186000', 16, 18,
+         84754, 2.43, 3, 9, '2022-11-03', '2022-11-10',
+         4]
+    ]
     assert result.values.tolist() == expect_sales_content
 # Test the create_and_push_parquet function
 
