@@ -30,7 +30,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
 
 resource "aws_lambda_layer_version" "fast_parquet_layer" {
   filename   = "${path.module}/../fast_parquet_layer/python.zip"
-  layer_name = "psycopg2"
+  layer_name = "fast_parquet_layer"
   compatible_runtimes = ["python3.10"]
 }
 
