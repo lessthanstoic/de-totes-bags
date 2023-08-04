@@ -87,6 +87,8 @@ jobs:
       - name: Terraform destroy
         working-directory: terraform
         run: terraform destroy -auto-approve
+        env: 
+          TF_VAR_my_email_alerts: ${{secrets.AWS_ALERT_EMAIL}}
 
       - name: Terraform init
         working-directory: terraform
