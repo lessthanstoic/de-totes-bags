@@ -1,4 +1,5 @@
-from python.transformation_function.src.dim_date_transformation import dim_date_transformation
+from python.transformation_function.src.dim_date_transformation import (
+    dim_date_transformation)
 import pandas as pd
 from pytest import raises
 
