@@ -12,8 +12,10 @@ import pandas as pd
 import io
 import os
 import ccy
-from botocore.exceptions import (EndpointConnectionError, NoCredentialsError, ClientError)
+from botocore.exceptions import (
+    EndpointConnectionError, NoCredentialsError, ClientError)
 from pprint import pprint
+
 
 def dim_currency_data_frame(table_name):
     """
@@ -38,7 +40,8 @@ def dim_currency_data_frame(table_name):
         # Connect to S3 client
         s3 = boto3.client('s3')
 
-        file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=file_name)
+        file = s3.get_object(
+            Bucket='ingested-data-vox-indicium', Key=file_name)
 
         # Define the column names
         # col_names = ["currency_id",
@@ -48,8 +51,8 @@ def dim_currency_data_frame(table_name):
         #              ]
 
         # Read the CSV file using the column names
-        data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')))
-
+        data_frame = pd.read_csv(io.StringIO(
+            file['Body'].read().decode('utf-8')))
 
         # Drop the original datetime columns
         data_frame = data_frame.drop(columns=['created_at', 'last_updated'])
@@ -57,10 +60,10 @@ def dim_currency_data_frame(table_name):
         # Populate dataframe with currency name
         currency_code_list = list(data_frame['currency_code'])
 
-        currency_name_list = [ccy.currency(currency_code).__dict__['name'] for currency_code in currency_code_list]
-        data_frame = data_frame.assign(currency_name=currency_name_list) 
+        currency_name_list = [ccy.currency(currency_code).__dict__[
+            'name'] for currency_code in currency_code_list]
+        data_frame = data_frame.assign(currency_name=currency_name_list)
 
-   
         # Set the column data types
         data_frame = data_frame.astype({
             "currency_id": "int",
@@ -89,6 +92,7 @@ def dim_currency_data_frame(table_name):
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
 
+
 def create_and_push_parquet(data_frame, new_table):
     '''
     Convert the DataFrames to a parquet format and push it to the processed s3 bucket.
@@ -103,12 +107,16 @@ def create_and_push_parquet(data_frame, new_table):
         # Connect to S3 client
         s3 = boto3.client('s3')
         # Send the parquet file to processed-data-vox-indicium s3 bouquet
-        s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{new_table}.parquet', Body=parquet_buffer.getvalue())
+        s3.put_object(Bucket='processed-data-vox-indicium',
+                      Key=f'{new_table}.parquet', Body=parquet_buffer.getvalue())
         # Print a confirmation message
-        print(f"Parquet file '{new_table}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
+        print(
+            f"Parquet file '{new_table}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
     except Exception as e:
         # Generic exception for unexpected errors during conversion
         raise Exception(f"An error occurred while converting to parquet: {e}")
+
+
 def main():
     """
     Runs both functions to create and transfer the final parquet file.
@@ -120,7 +128,7 @@ def main():
         new_table = "dim_currency"
         # Call the dim_currency_data_frame function
         df = dim_currency_data_frame(currency_table)
-        #Call the create_and_push_parquet function
+        # Call the create_and_push_parquet function
         create_and_push_parquet(df, new_table)
     # Generic exception for unexpected errors during the running of the functions
     except Exception as e:

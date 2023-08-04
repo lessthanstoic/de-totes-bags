@@ -38,7 +38,7 @@ def dim_date_transformation(dataframe):
                 - TypeError - if not passed dataframe as argument"""
 
     try:
-    
+
         created_list = list(dataframe['created_date'])
         updated_list = list(dataframe['last_updated_date'])
         payment_list = list(dataframe['agreed_payment_date'])
@@ -57,8 +57,6 @@ def dim_date_transformation(dataframe):
             date_format = '%Y-%m-%d'
 
             date_obj = datetime.strptime(date, date_format)
-
-        
 
             output_data['year'].append(date_obj.year)
             output_data['month'].append(date_obj.month)

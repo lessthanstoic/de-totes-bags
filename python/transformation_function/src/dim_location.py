@@ -29,7 +29,8 @@ def dim_address_data_frame(address_table):
         # Connect to S3 client
         s3 = boto3.client('s3')
 
-        file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=file_name)
+        file = s3.get_object(
+            Bucket='ingested-data-vox-indicium', Key=file_name)
 
         # Define the column names
         col_names = ["address_id",
@@ -45,8 +46,9 @@ def dim_address_data_frame(address_table):
                      ]
 
         # Read the CSV file using the column names
-        data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')), names=col_names)
-        
+        data_frame = pd.read_csv(io.StringIO(
+            file['Body'].read().decode('utf-8')), names=col_names)
+
         # Drop the original datetime columns
         data_frame = data_frame.drop(columns=['created_at', 'last_updated'])
 
@@ -62,7 +64,7 @@ def dim_address_data_frame(address_table):
             "city": "str",
             "postal_code": "str",
             "country": "str",
-            "phone": "str"           
+            "phone": "str"
         })
 
         # Sorted the date frame
@@ -74,21 +76,21 @@ def dim_address_data_frame(address_table):
     except ValueError as e:
         # Catching the specific ValueError before the generic Exception
         raise e
-    
+
     except ClientError as e:
         # Catch the error if the table name is non-existent
         if e.response['Error']['Code'] == 'NoSuchKey':
             raise ValueError(f"The file {address_table} does not exist")
         else:
             raise e
-        
+
     except TypeError as e:
         # catches the error if the user taps an incorrect input
         raise e
-    
+
     except FileNotFoundError:
         raise FileNotFoundError(f"The file {file_name} does not exist")
-    
+
     except Exception as e:
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
@@ -110,14 +112,17 @@ def create_and_push_parquet(data_frame, new_table):
         s3 = boto3.client('s3')
 
         # Send the parquet file to processed-data-vox-indicium s3 bouquet
-        s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{new_table}.parquet', Body=parquet_buffer.getvalue())
+        s3.put_object(Bucket='processed-data-vox-indicium',
+                      Key=f'{new_table}.parquet', Body=parquet_buffer.getvalue())
 
         # Print a confirmation message
-        print(f"Parquet file '{new_table}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
-        
+        print(
+            f"Parquet file '{new_table}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
+
     except Exception as e:
         # Generic exception for unexpected errors during conversion
         raise Exception(f"An error occurred while converting to parquet: {e}")
+
 
 def main():
     """
@@ -125,18 +130,17 @@ def main():
     """
     try:
         # Table name for the tables used in the function dim_address_data_frame
-        address_table = 'address' 
+        address_table = 'address'
 
         # The name of the parquet file
         new_table = "dim_location"
 
         # Call the design_table_data_frame function
-        df = dim_address_data_frame(address_table)  
+        df = dim_address_data_frame(address_table)
 
-        #Call the create_and_push_parquet function
+        # Call the create_and_push_parquet function
         create_and_push_parquet(df, new_table)
 
      # Generic exception for unexpected errors during the running of the functions
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
-

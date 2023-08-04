@@ -1,20 +1,23 @@
 import boto3
 import pandas as pd
 import io
-import os
-from botocore.exceptions import (EndpointConnectionError, NoCredentialsError, ClientError)
+from botocore.exceptions import ClientError
 import logging
 
 logger = logging.getLogger('MyLogger')
 logger.setLevel(logging.INFO)
 
+
 def dim_address_data_frame(table_name):
     """
-    The function dim_address_data_frame reads a .csv file from our ingestion bucket and manipulates columns name with specific datatype and returns a nice data frame.
+    The function dim_address_data_frame reads a .csv file
+    from our ingestion bucket and manipulates columns name
+    with specific datatype and returns a nice data frame.
     Arguments:
     table_name (string) - represents the name of a table in our database.
     Output:
-    resulting_df (DataFrame) - outputs the read .csv file as a pandas DataFrame for use with other functions
+    resulting_df (DataFrame) - outputs the read .csv file as a pandas
+    DataFrame for use with other functions
     Errors:
     TypeError - if input is not a string
     ValueError - if input is not a valid table name
@@ -30,7 +33,8 @@ def dim_address_data_frame(table_name):
         # Connect to S3 client
         s3 = boto3.client('s3')
 
-        file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=file_name)
+        file = s3.get_object(
+            Bucket='ingested-data-vox-indicium', Key=file_name)
 
         # # Define the column names
         # col_names = ["address_id",
@@ -46,8 +50,8 @@ def dim_address_data_frame(table_name):
         #              ]
 
         # Read the CSV file using the column names
-        data_frame = pd.read_csv(io.StringIO(file['Body'].read().decode('utf-8')))
-
+        data_frame = pd.read_csv(io.StringIO(
+            file['Body'].read().decode('utf-8')))
 
         # Drop the original datetime columns
         data_frame = data_frame.drop(columns=['created_at', 'last_updated'])
@@ -68,8 +72,8 @@ def dim_address_data_frame(table_name):
             "phone": "str",
         })
 
-        data_frame = data_frame.replace('nan','')
-    
+        data_frame = data_frame.replace('nan', '')
+
         # Return the final DataFrame
         return data_frame
 
@@ -96,7 +100,8 @@ def create_parquet(data_frame, table_name):
     """
     Convert the DataFrame to a parquet format.
     Arguments:
-    data_frame - represent the DataFrame from the function dim_address_data_frame.
+    data_frame - represent the DataFrame from the
+    function dim_address_data_frame.
     table_name (string) - represents the name of a table in our database.
     """
     try:
@@ -105,17 +110,22 @@ def create_parquet(data_frame, table_name):
         data_frame.to_parquet(parquet_buffer, engine='pyarrow')
 
         s3 = boto3.client('s3')
-        s3.put_object(Bucket='ingested-data-vox-indicium', Key=f'{table_name}.parquet', Body=parquet_buffer.getvalue())
+        s3.put_object(Bucket='ingested-data-vox-indicium',
+                      Key=f'{table_name}.parquet',
+                      Body=parquet_buffer.getvalue())
 
-        print(f"Parquet file '{table_name}.parquet' created in S3 bucket 'ingested-data-vox-indicium'.")
+        print(
+            f"Parquet file '{table_name}.parquet' created in S3 bucket")
 
     except Exception as e:
         # Generic exception for unexpected errors during conversion
         raise Exception(f"An error occurred while converting to parquet: {e}")
 
+
 def push_parquet_file(table_name):
     """
-    Function to copy a Parquet file from one Amazon S3 bucket to another, then delete the original.
+    Function to copy a Parquet file from one Amazon S3
+    bucket to another, then delete the original.
     param table_name: Name of the table (without extension) to be transferred.
     """
     try:
@@ -128,22 +138,28 @@ def push_parquet_file(table_name):
             'Key': f'{table_name}.parquet'
         }
 
-        s3_resource.meta.client.copy(copy_source, 'processed-data-vox-indicium', f'{table_name}.parquet')
+        s3_resource.meta.client.copy(
+            copy_source, 'processed-data-vox-indicium',
+            f'{table_name}.parquet')
 
         # Delete the original parquet file
-        s3.delete_object(Bucket='ingested-data-vox-indicium', Key=f'{table_name}.parquet')
+        s3.delete_object(Bucket='ingested-data-vox-indicium',
+                         Key=f'{table_name}.parquet')
 
-        print(f"Parquet file '{table_name}.parquet' transferred to S3 bucket 'processed-data-vox-indicium'.")
+        print(
+            f"Parquet file '{table_name}.parquet' transferred to S3 bucket.")
     except Exception as e:
-        raise Exception(f"An error occurred while transferring the parquet file: {e}")
+        raise Exception(
+            f"An error occurred while transferring the parquet file: {e}")
+
 
 def main():
     """
     Runs both functions to create and transfer the final parquet file.
     """
     try:
-        table_name = 'address'  
-        df = dim_address_data_frame(table_name)  
+        table_name = 'address'
+        df = dim_address_data_frame(table_name)
 
         create_parquet(df, table_name)
 
@@ -151,4 +167,3 @@ def main():
 
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
-
