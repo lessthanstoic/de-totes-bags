@@ -5,6 +5,8 @@ from python.transformation_function.src.dim_date_transformation import dim_date_
 from python.transformation_function.src.dim_design_table import dim_design_table_data_frame
 from python.transformation_function.src.fact_sales_order import fact_sales_order_data_frame, create_and_push_parquet
 from python.transformation_function.src.dim_date_transformation import dim_date_transformation
+from python.transformation_function.src.dim_staff import dim_staff_data_frame
+
 
 from pprint import pprint
 import logging
@@ -53,5 +55,12 @@ def transformation_function(event, context):
         date_df = dim_date_transformation(sales_order_df)
         date_parquet = create_and_push_parquet(date_df, "dim_date")
         pprint(date_parquet)
+    except Exception as e:
+        logger.error(e)
+
+    try:
+        staff_df = dim_staff_data_frame("staff_changes", "department")
+        staff_parquet = create_and_push_parquet(staff_df, "dim_staff")
+        pprint(staff_parquet)
     except Exception as e:
         logger.error(e)

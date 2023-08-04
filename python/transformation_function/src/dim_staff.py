@@ -45,24 +45,24 @@ def dim_staff_data_frame(staff_table, department_table):
         department_file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=department_name)
 
         # Define the column names
-        staff_col_names = ['staff_id', 
-                           'first_name', 
-                           'last_name', 
-                           'department_id', 
-                           'email_address', 
-                           'created_at timestamp', 
-                           'last_updated']
+        # staff_col_names = ['staff_id', 
+        #                    'first_name', 
+        #                    'last_name', 
+        #                    'department_id', 
+        #                    'email_address', 
+        #                    'created_at timestamp', 
+        #                    'last_updated']
         
-        department_col_names = ['department_id',
-                                'department_name', 
-                                'location',
-                                'manager',
-                                'created_at', 
-                                'last_updated']
+        # department_col_names = ['department_id',
+        #                         'department_name', 
+        #                         'location',
+        #                         'manager',
+        #                         'created_at', 
+        #                         'last_updated']
         
         # Read the CSV files using the column names
-        staff_df = pd.read_csv(io.StringIO(staff_file['Body'].read().decode('utf-8')), names=staff_col_names)
-        department_df = pd.read_csv(io.StringIO(department_file['Body'].read().decode('utf-8')), names=department_col_names)
+        staff_df = pd.read_csv(io.StringIO(staff_file['Body'].read().decode('utf-8')))
+        department_df = pd.read_csv(io.StringIO(department_file['Body'].read().decode('utf-8')))
 
         # Merge staff_df and department_df DataFrames on matching 'department_id' and 'department_id', retaining distinct suffixes for overlapping columns
         merged_df = pd.merge(staff_df, department_df, left_on='department_id', right_on='department_id', suffixes=('', '_department'))
