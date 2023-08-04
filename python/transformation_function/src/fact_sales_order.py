@@ -10,6 +10,11 @@ import boto3
 import pandas as pd
 import io
 from botocore.exceptions import ClientError
+import logging
+
+logger = logging.getLogger('MyLogger')
+logger.setLevel(logging.INFO)
+
 
 def fact_sales_order_data_frame(sales_order_table):
     """
@@ -200,6 +205,7 @@ def create_and_push_parquet(data_frame, file_name):
         s3 = boto3.client('s3')
         s3.put_object(Bucket='processed-data-vox-indicium', Key=f'{file_name}.parquet', Body=parquet_buffer.getvalue())
     
+        logger.info(f"Parquet file '{file_name}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
         return f"Parquet file '{file_name}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'."
         
     except Exception as e:

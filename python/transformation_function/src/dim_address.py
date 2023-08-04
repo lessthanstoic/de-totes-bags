@@ -3,7 +3,10 @@ import pandas as pd
 import io
 import os
 from botocore.exceptions import (EndpointConnectionError, NoCredentialsError, ClientError)
+import logging
 
+logger = logging.getLogger('MyLogger')
+logger.setLevel(logging.INFO)
 
 def dim_address_data_frame(table_name):
     """
@@ -66,7 +69,7 @@ def dim_address_data_frame(table_name):
         })
 
         data_frame = data_frame.replace('nan','')
-
+    
         # Return the final DataFrame
         return data_frame
 
