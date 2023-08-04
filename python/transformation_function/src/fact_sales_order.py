@@ -236,10 +236,10 @@ def main():
         dim_date = "dim_date"
 
         # Call the fact_sales_order_data_frame function
-        sales_df, date_df = fact_sales_order_data_frame(sales_order_table)
+        sales_df = fact_sales_order_data_frame(sales_order_table)
 
         #Call the create_and_push_parquet function
-        create_and_push_parquet(sales_df, date_df, fact_sales_order, dim_date)
+        create_and_push_parquet(sales_df, fact_sales_order)
 
     # Generic exception for unexpected errors during the running of the functions
     except Exception as e:
