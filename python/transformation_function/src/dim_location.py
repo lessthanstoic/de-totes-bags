@@ -6,11 +6,14 @@ from botocore.exceptions import ClientError
 
 def dim_address_data_frame(address_table):
     """
-    The function dim_address_data_frame reads a .csv file from our ingestion bucket and manipulates columns name with specific datatype and returns a nice data frame.
+    The function dim_address_data_frame reads a .csv file from our ingestion
+    bucket and manipulates columns name with specific datatype and returns
+    a nice data frame.
     Arguments:
     address_table (string) - represents the name of a table in our database.
     Output:
-    resulting_df (DataFrame) - outputs the read .csv file as a pandas DataFrame for use with other functions
+    resulting_df (DataFrame) - outputs the read .csv file as a pandas
+    DataFrame for use with other functions
     Errors:
     TypeError - if input is not a string
     ValueError - Catching the specific ValueError
@@ -98,26 +101,28 @@ def dim_address_data_frame(address_table):
 
 def create_and_push_parquet(data_frame, new_table):
     '''
-    Convert the DataFrames to a parquet format and push it to the processed s3 bucket.
+    Convert the DataFrames to a parquet format and push it to the
+    processed s3 bucket.
     Arguments:
     data_frame - represent the DataFrame from of address table.
     table_name(string) - represents the name of a table in our database.
     '''
     try:
-       # Save DataFrame to a parquet file in memory
+        # Save DataFrame to a parquet file in memory
         parquet_buffer = io.BytesIO()
         data_frame.to_parquet(parquet_buffer, engine='pyarrow')
 
         # Connect to S3 client
         s3 = boto3.client('s3')
 
-        # Send the parquet file to processed-data-vox-indicium s3 bouquet
+        # Send the parquet file to processed-data-vox-indicium s3 bucket
         s3.put_object(Bucket='processed-data-vox-indicium',
-                      Key=f'{new_table}.parquet', Body=parquet_buffer.getvalue())
+                      Key=f'{new_table}.parquet',
+                      Body=parquet_buffer.getvalue())
 
         # Print a confirmation message
         print(
-            f"Parquet file '{new_table}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
+            f"Parquet file '{new_table}.parquet' created in S3 bucket.")
 
     except Exception as e:
         # Generic exception for unexpected errors during conversion
@@ -129,7 +134,7 @@ def main():
     Runs both functions to create and transfer the final parquet file.
     """
     try:
-        # Table name for the tables used in the function dim_address_data_frame
+        # Table name for the tables used in dataframe
         address_table = 'address'
 
         # The name of the parquet file
@@ -141,6 +146,6 @@ def main():
         # Call the create_and_push_parquet function
         create_and_push_parquet(df, new_table)
 
-     # Generic exception for unexpected errors during the running of the functions
+    # Generic exception for unexpected errors during function
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
