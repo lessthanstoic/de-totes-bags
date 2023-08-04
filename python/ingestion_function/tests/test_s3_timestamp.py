@@ -10,7 +10,8 @@ def create_mock_s3():
     mock_client.create_bucket(Bucket='ingested-data-vox-indicium',
                               CreateBucketConfiguration={
                                   'LocationConstraint': 'eu-west-2', })
-    with open('python/ingestion_function/tests/mock_timestamp.txt', 'rb') as data:
+    with open('python/ingestion_function/tests/mock_timestamp.txt',
+              'rb') as data:
         mock_client.put_object(Bucket='ingested-data-vox-indicium',
                                Body=data,
                                Key='mock_timestamp.txt')

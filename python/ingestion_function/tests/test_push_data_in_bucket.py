@@ -1,5 +1,5 @@
-from python.ingestion_function.src.push_data_in_bucket import push_data_in_bucket
-from python.ingestion_function.src.push_data_in_bucket import log_changes_to_db
+from python.ingestion_function.src.push_data_in_bucket import (
+    push_data_in_bucket)
 from moto import mock_s3, mock_logs
 import boto3
 from pytest import raises
