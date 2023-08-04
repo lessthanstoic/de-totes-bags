@@ -247,10 +247,12 @@ resource "aws_iam_policy" "s3_trans_write_policy" {
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment" {
     role = aws_iam_role.iam_for_ingestion_lambda.name
     policy_arn = aws_iam_policy.s3_write_policy.arn
+    force_detach_policies = true
 }
 
 
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment_transformation" {
     role = aws_iam_role.iam_for_transformation_lambda.name
     policy_arn = aws_iam_policy.s3_trans_write_policy.arn
+    force_detach_policies = true
 }
