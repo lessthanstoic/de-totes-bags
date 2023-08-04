@@ -1,8 +1,10 @@
 """
-This module reads .csv files from our ingestion bucket, and converts them to a pandas data frame.
+This module reads .csv files from our ingestion bucket, and converts them
+to a pandas data frame.
 This module contains four functions:
 dim_design_table_data_frame- reads the CSV file and returns a DataFrame.
-create_and_push_parquet - converts the DataFrame to a parquet file and push the parquet file in the process data bucket
+create_and_push_parquet - converts the DataFrame to a parquet file and push
+the parquet file in the process data bucket
 main - runs all functions to create the final parquet file.
 """
 import boto3
@@ -13,11 +15,14 @@ from botocore.exceptions import ClientError
 
 def dim_design_table_data_frame(design_table):
     """
-    The function design_table_data_frame reads a .csv file from our ingestion bucket and manipulate columns name with specific datatype and return a nice data frame.
+    The function design_table_data_frame reads a .csv file from our ingestion
+    bucket and manipulate columns name with specific datatype and return
+    a nice data frame.
     Arguments:
     design_table (string) - represents the name of a table in our database.
     Output:
-    resulting_df (DataFrame) - outputs the read .csv file as a pandas DataFrame for use with other functions
+    resulting_df (DataFrame) - outputs the read .csv file as a pandas
+    DataFrame for use with other functions
     Errors:
     TypeError - if input is not a string
     ValueError - Catching the specific ValueError
@@ -83,7 +88,7 @@ def dim_design_table_data_frame(design_table):
             raise e
 
     except TypeError as e:
-       # catches the error if the user tap an incorrect input
+        # catches the error if the user tap an incorrect input
         raise e
 
     except FileNotFoundError:
@@ -96,13 +101,16 @@ def dim_design_table_data_frame(design_table):
 
 def create_and_push_parquet(data_frame, new_table):
     '''
-    Convert the DataFrames to a parquet format and push it to the processed s3 bucket.
+    Convert the DataFrames to a parquet format and push it to the
+    processed s3 bucket.
     Arguments:
-    data_frame - represent the DataFrame from of sales table the function fact_sales_order_data_frame.
-    new_table(string) - represents the name of the final table from processed-data-vox-indicium s3 bucket.
+    data_frame - represent the DataFrame from of sales table the
+    function fact_sales_order_data_frame.
+    new_table(string) - represents the name of the final table
+    from processed-data-vox-indicium s3 bucket.
     '''
     try:
-       # Save DataFrame to a parquet file in memory
+        # Save DataFrame to a parquet file in memory
         parquet_buffer = io.BytesIO()
         data_frame.to_parquet(parquet_buffer, engine='pyarrow')
 
@@ -111,11 +119,12 @@ def create_and_push_parquet(data_frame, new_table):
 
         # Send the parquet file to processed-data-vox-indicium s3 bouquet
         s3.put_object(Bucket='processed-data-vox-indicium',
-                      Key=f'{new_table}.parquet', Body=parquet_buffer.getvalue())
+                      Key=f'{new_table}.parquet',
+                      Body=parquet_buffer.getvalue())
 
         # Print a confirmation message
         print(
-            f"Parquet file '{new_table}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
+            f"Parquet file '{new_table}.parquet' created in S3 bucket.")
 
     except Exception as e:
         # Generic exception for unexpected errors during conversion
@@ -127,7 +136,7 @@ def main():
     Runs all functions to create and transfer the final parquet file.
     """
     try:
-        # Table name for the tables used in the function dim_design_table_data_frame
+        # Table name for the tables used in data_frame
         design_table = 'design'
 
         # The name of the parquet file
@@ -139,6 +148,6 @@ def main():
         # Call the create_and_push_parquet function
         create_and_push_parquet(df, new_table)
 
-    # Generic exception for unexpected errors during the running of the functions
+    # Generic exception for unexpected errors during function
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
