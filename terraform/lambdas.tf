@@ -8,8 +8,7 @@ resource "aws_lambda_function" "s3_file_reader" {
   runtime = var.pythonversion
   timeout = 60
   layers = [aws_lambda_layer_version.lambda_layer.arn, "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3"]
-  depends_on = [ aws_cloudwatch_log_group.ingestion_lambda_log ]
-  depends_on = [ iam.aws_iam_role_policy_attachment.lambda_S3_write_policy_attachment ]
+  depends_on = [ aws_cloudwatch_log_group.ingestion_lambda_log, iam.aws_iam_role_policy_attachment.lambda_S3_write_policy_attachment ]
 }
 
 # creates the log group for the lambda - done automatically through aws
