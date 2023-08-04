@@ -36,7 +36,7 @@ def copy_from_file(conn, df, table):
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         os.remove(tmp_df)
-        print("Error: %s" % error)
+        logger.error("Error: database error", error)
         conn.rollback()
         cursor.close()
         return 1
@@ -60,7 +60,7 @@ def copy_from_stringio(conn, df, table):
         cursor.copy_from(buffer, table, sep=",")
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
-        print("Error: %s" % error)
+        logger.error("Error: database error", error)
         conn.rollback()
         cursor.close()
         return 1
@@ -100,7 +100,7 @@ def update_from_file(conn, df, table, primary_keys_list):
         extras.execute_values(cursor, merge_query, data_tuples)
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as e:
-        print("Error: %s" % e)
+        logger.error("Error: database error")
         conn.rollback()
         cursor.close()
         raise e
@@ -124,9 +124,10 @@ def get_table_primary_key(conn, table):
         query_results = cursor.fetchall()
         primary_keys = [row[0] for row in query_results]
     except (Exception, psycopg2.DatabaseError) as e:
-        print("Error: %s" % e)
+        logger.error("Error: database error")
         conn.rollback()
         cursor.close()
         return 1
 
+    logger.info("Primary Keys retrieved from database")
     return primary_keys

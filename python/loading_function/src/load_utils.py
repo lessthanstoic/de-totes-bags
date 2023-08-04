@@ -41,6 +41,11 @@ import pandas as pd
 import boto3
 import io
 import os
+import logging
+from botocore.exceptions import ClientError
+
+logger = logging.getLogger('MyLogger')
+logger.setLevel(logging.INFO)
 
 
 def getDataFrameFromS3Parquet(bucket_name, file_name):
@@ -57,17 +62,20 @@ def getDataFrameFromS3Parquet(bucket_name, file_name):
         pandas.DataFrame: The DataFrame containing the data
         from the Parquet file.
     """
+    try:
     # Connect to the s3
-    s3 = boto3.client('s3')
+        s3 = boto3.client('s3')
 
-    # Get the object with the input file_name from the S3 bucket
-    file = s3.get_object(Bucket=bucket_name, Key=file_name)
-    par = file['Body']
-    file_like_obj = io.BytesIO(par.read())
+        # Get the object with the input file_name from the S3 bucket
+        file = s3.get_object(Bucket=bucket_name, Key=file_name)
+        par = file['Body']
+        file_like_obj = io.BytesIO(par.read())
+        # Read the Parquet data into a DataFrame using the 'fastparquet' engine
+        df = pd.read_parquet(file_like_obj, engine='fastparquet')
+        return df
 
-    # Read the Parquet data into a DataFrame using the 'fastparquet' engine
-    df = pd.read_parquet(file_like_obj, engine='fastparquet')
-    return df
+    except ClientError as e:
+        logger.error("Client error", e)
 
 
 def getFileFromS3(bucket_name, file_name):
@@ -82,12 +90,19 @@ def getFileFromS3(bucket_name, file_name):
         tuple: A tuple containing the file contents (bytes) and the
         HTTP status code of the response.
     """
+    try: 
     # Connect to the S3 service
-    s3 = boto3.client('s3')
-    # Get the object with the input file_name from the S3 bucket
-    file = s3.get_object(Bucket=bucket_name, Key=file_name)
-    # Return the file contents (bytes) and the HTTP status code of the response
-    return file['Body'].read(), file['ResponseMetadata']['HTTPStatusCode']
+        s3 = boto3.client('s3')
+        # Get the object with the input file_name from the S3 bucket
+        file = s3.get_object(Bucket=bucket_name, Key=file_name)
+        # Return the file contents (bytes) and the HTTP status code of the response
+        return file['Body'].read(), file['ResponseMetadata']['HTTPStatusCode']
+    
+    except ClientError as e:
+        logger.error("Client error", e)
+    except TypeError:
+        raise TypeError("Function must take a string input")
+
 
 
 def readParquetFromBytesObject(file):
@@ -117,15 +132,19 @@ def list_parquet_files_in_bucket(bucket_name):
     Returns:
         list: A list of Parquet file names present in the specified S3 bucket.
     """
-    # Connect to the S3 service
-    s3 = boto3.client('s3')
+    try:
+        # Connect to the S3 service
+        s3 = boto3.client('s3')
 
-    # List objects in the bucket
-    files = s3.list_objects(Bucket=bucket_name)
+        # List objects in the bucket
+        files = s3.list_objects(Bucket=bucket_name)
 
-    # Extract the keys (file names) of objects that end with '.parquet'
-    return [file['Key'] for file in files['Contents']
-            if file['Key'].endswith('.parquet')]
+        # Extract the keys (file names) of objects that end with '.parquet'
+        return [file['Key'] for file in files['Contents']
+                if file['Key'].endswith('.parquet')]
+    
+    except ClientError as e:
+        logger.error("Client error", e)
 
 
 def has_lambda_been_called():
