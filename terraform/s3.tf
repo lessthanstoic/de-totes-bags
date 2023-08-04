@@ -48,6 +48,7 @@ EOF
 # Add bucket trigger
 resource "aws_s3_bucket" "processed_data_bucket" {
     bucket="processed-data-vox-indicium"
+    force_destroy = true
 }
 
 resource "aws_s3_bucket_policy" "processed_data_policy" {
