@@ -20,14 +20,8 @@ def create_mock_s3():
         s3.create_bucket(Bucket='processed-data-vox-indicium',
                          CreateBucketConfiguration={'LocationConstraint':
                                                     'eu-west-2'})
-        csv_data = """staff_id,first_name,last_name,department_id,
-        email_address,created_at,last_updated\n1,Jeremie,Franey,
-        2,jeremie.franey@terrifictotes.com,2022-11-03 14:20:51.563000,
-        2022-11-03 14:20:51.563000\n"""
-        csv_data2 = """department_id,department_name,location,manager,
-        created_at,last_updated\n2,Purchasing,Manchester,
-        Naomi Lapaglia,2022-11-03 14:20:49.962000,
-        2022-11-03 14:20:49.962000\n"""
+        csv_data = "staff_id,first_name,last_name,department_id,email_address,created_at,last_updated\n1,Jeremie,Franey,2,jeremie.franey@terrifictotes.com,2022-11-03 14:20:51.563000,2022-11-03 14:20:51.563000\n"  # noqa: E501
+        csv_data2 = "department_id,department_name,location,manager,created_at,last_updated\n2,Purchasing,Manchester,Naomi Lapaglia,2022-11-03 14:20:49.962000,2022-11-03 14:20:49.962000\n"  # noqa: E501
         s3.put_object(Bucket='ingested-data-vox-indicium',
                       Key='staff.csv', Body=csv_data)
         s3.put_object(Bucket='ingested-data-vox-indicium',

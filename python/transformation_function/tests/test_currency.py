@@ -20,9 +20,7 @@ def create_mock_s3():
         s3.create_bucket(
             Bucket='processed-data-vox-indicium',
             CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
-        csv_data = """currency_id,currency_code,created_at,
-        last_updated\n2,USD,2022-11-03 14:20:49.962000,
-        2022-11-03 14:20:49.962000\n"""
+        csv_data = "currency_id,currency_code,created_at,last_updated\n2,USD,2022-11-03 14:20:49.962000,2022-11-03 14:20:49.962000\n"  # noqa: E501
         s3.put_object(
             Bucket='ingested-data-vox-indicium',
             Key='currency.csv', Body=csv_data)
