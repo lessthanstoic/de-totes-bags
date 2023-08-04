@@ -1,8 +1,10 @@
 """
-This module reads .csv files from our ingestion bucket, and converts them to a pandas data frame.
+This module reads .csv files from our ingestion bucket,
+and converts them to a pandas data frame.
 This module contains three functions:
 dim_counterparty_data_frame - reads the CSV files and returns a DataFrame.
-create_and_push_parquet - converts the DataFrame to a parquet file and push the parquet file in the process data bucket
+create_and_push_parquet - converts the DataFrame to a parquet file and
+push the parquet file in the process data bucket
 main - runs all functions to create the final parquet file.
 """
 
@@ -14,18 +16,23 @@ from botocore.exceptions import ClientError
 
 def dim_counterparty_data_frame(counterparty_table, address_table):
     """
-    The function dim_counterparty_data_frame reads the .csv files from our ingestion bucket and manipulate columns name with specific datatype and return a nice data frame.
+    The function dim_counterparty_data_frame reads the .csv files from our
+    ingestion bucket and manipulate columns name with specific datatype and
+    return a nice data frame.
     Arguments:
-    counterparty_table (string) - represents the name of counterparty table from ingestion bucket.
-    address_table (string) - represents the name of address table from ingestion bucket.
+    counterparty_table (string) - represents the name of counterparty table
+    from ingestion bucket.
+    address_table (string) - represents the name of address table from
+    ingestion bucket.
     Output:
-    data_frame (DataFrame) - outputs the read .csv files as a pandas DataFrame with information from the both tables
+    data_frame (DataFrame) - outputs the read .csv files as a pandas
+    DataFrame with information from the both tables
     Errors:
     TypeError - if input is not a string
     ValueError - Catching the specific ValueError
     ClientError - Catch the error if the table name is non-existent
     FileNotFoundError - if the file was not found
-    Exception - for general errors 
+    Exception - for general errors
 
     """
 
@@ -74,8 +81,11 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
         address_df = pd.read_csv(io.StringIO(
             address_file['Body'].read().decode('utf-8')))
 
-        # Merge counterparty_df and address_df DataFrames on matching 'legal_address_id' and 'address_id', retaining distinct suffixes for overlapping columns
-        merged_df = pd.merge(counterparty_df, address_df, left_on='legal_address_id',
+        # Merge counterparty_df and address_df DataFrames
+        # on matching 'legal_address_id' and 'address_id',
+        # retaining distinct suffixes for overlapping columns
+        merged_df = pd.merge(counterparty_df, address_df,
+                             left_on='legal_address_id',
                              right_on='address_id', suffixes=('', '_address'))
 
         # Rename and reorder the columns
@@ -92,7 +102,8 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
 
         selected_columns = [
             'counterparty_id', 'counterparty_legal_name',
-            'counterparty_legal_address_line_1', 'counterparty_legal_address_line2',
+            'counterparty_legal_address_line_1',
+            'counterparty_legal_address_line2',
             'counterparty_legal_district', 'counterparty_legal_city',
             'counterparty_legal_postal_code', 'counterparty_legal_country',
             'counterparty_legal_phone_number'
@@ -128,7 +139,7 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
         # Catch the error if the table name is non-existent
         if e.response['Error']['Code'] == 'NoSuchKey':
             raise ValueError(
-                f"The file {counterparty_table} or {address_table} does not exist")
+                f"{counterparty_table} or {address_table} do not exist")
         else:
             raise e
 
@@ -147,10 +158,13 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
 
 def create_and_push_parquet(df, new_table):
     '''
-    Convert the DataFrames to a parquet format and push it to the processed-data-vox-indicium s3 bucket.
+    Convert the DataFrames to a parquet format and push it to the
+    processed-data-vox-indicium s3 bucket.
     Arguments:
-    df - represents the data frame resulting from combining the counterparty and address tables in the function dim_counterparty_data_frame 
-    new_table(string) - represents the name of the final table from processed-data-vox-indicium s3 bucket.
+    df - represents the data frame resulting from combining the counterparty
+    and address tables in the function dim_counterparty_data_frame
+    new_table(string) - represents the name of the final table from
+    processed-data-vox-indicium s3 bucket.
     '''
     try:
         # Save DataFrame to a parquet file in memory
@@ -162,11 +176,12 @@ def create_and_push_parquet(df, new_table):
 
         # Send the parquet file to processed-data-vox-indicium s3 bouquet
         s3.put_object(Bucket='processed-data-vox-indicium',
-                      Key=f'{new_table}.parquet', Body=parquet_buffer.getvalue())
+                      Key=f'{new_table}.parquet',
+                      Body=parquet_buffer.getvalue())
 
         # Print a confirmation message
         print(
-            f"Parquet file '{new_table}.parquet' created and stored in S3 bucket 'processed-data-vox-indicium'.")
+            f"'{new_table}.parquet' created and stored in S3 bucket.")
 
     except Exception as e:
         # Generic exception for unexpected errors during conversion
@@ -178,7 +193,7 @@ def main():
     Runs both functions to create and transfer the final parquet file.
     '''
     try:
-        # Tables names for the tables used in the function dim_counterparty_data_frame
+        # Tables names for the tables for data_frame
         counterparty_table = 'counterparty'
         address_table = 'address'
 
@@ -191,6 +206,6 @@ def main():
         # Call the create_and_push_parquet function
         create_and_push_parquet(df, new_table)
 
-    # Generic exception for unexpected errors during the running of the functions
+    # Generic exception for unexpected errors during functions
     except Exception as e:
         print(f"An error occurred in the main function: {e}")
