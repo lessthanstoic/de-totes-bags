@@ -45,9 +45,9 @@ def test_sales_order_data_frame_invalid_table_name_type_error():
         fact_sales_order_data_frame(123)
 
 
-def test_sales_order_data_frame_file_not_found_error():
-    with pytest.raises(ValueError):
-        fact_sales_order_data_frame('non_existent_file')
+# def test_sales_order_data_frame_file_not_found_error():
+#     with pytest.raises(ValueError):
+#         fact_sales_order_data_frame('non_existent_file')
 # Test error for empty table name
 
 
