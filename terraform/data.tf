@@ -7,21 +7,21 @@ data "aws_region" "current" {
 
 data "archive_file" "ingestion_lambda" {
   type        = "zip"
-  source_dir = "${path.module}/../python/ingestion_function/src" 
+  source_dir = "${path.module}/../deployment/ingestion_function" 
   output_path = "${path.module}/../ingestion_function.zip"
 }
 
 
 data "archive_file" "transform_lambda" {
   type        = "zip"
-  source_dir = "${path.module}/../python/transformation_function/src"
+  source_dir = "${path.module}/../deployment/transformation_function"
   output_path = "${path.module}/../transformation_function.zip"
 }
 
 
 data "archive_file" "warehouse_lambda" {
   type        = "zip"
-  source_dir = "${path.module}/../python/loading_function/src"
+  source_dir = "${path.module}/../deployment/loading_function"
   output_path = "${path.module}/../loading_function.zip"
 }
 

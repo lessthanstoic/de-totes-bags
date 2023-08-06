@@ -85,13 +85,13 @@ data "aws_iam_policy_document" "ingestion_cw_document" {
   #   actions = [ "logs:CreateLogGroup" ]
 
   #   resources = [
-  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.ingestion_lambda_log.name}:*"
   #   ]
   # }
 
   statement {
 
-    actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
+    actions = [ "logs:PutLogEvents" ]
 
     resources = [
       # I presume this works for all lambdas now?
@@ -148,19 +148,19 @@ data "aws_iam_policy_document" "loading_cw_document" {
 }
 
 resource "aws_iam_policy" "ingestion_cw_policy" {
-  name        = "cloudwatch-log-policy"
+  name        = "cloudwatch-ingestion-log-policy"
   description = "A policy to give ingestion lambda permissions to log to cloudwatch"
   policy      = data.aws_iam_policy_document.ingestion_cw_document.json
 }
 
 resource "aws_iam_policy" "transformation_cw_policy" {
-  name        = "cloudwatch-log-policy"
+  name        = "cloudwatch-transformation-log-policy"
   description = "A policy to give ingestion lambda permissions to log to cloudwatch"
   policy      = data.aws_iam_policy_document.transformation_cw_document.json
 }
 
 resource "aws_iam_policy" "loading_cw_policy" {
-  name        = "cloudwatch-log-policy"
+  name        = "cloudwatch-loading-log-policy"
   description = "A policy to give ingestion lambda permissions to log to cloudwatch"
   policy      = data.aws_iam_policy_document.loading_cw_document.json
 }
@@ -202,7 +202,7 @@ resource "aws_iam_role_policy_attachment" "loading_lambda_secretsmanager_policy_
 
 ####################################################################################
 #
-# S3 Write Permission
+# S3 Read/Write Permission
 #
 
 resource "aws_iam_policy" "s3_write_policy" {
@@ -242,7 +242,7 @@ resource "aws_iam_policy" "s3_trans_write_policy" {
         "Action": [
             "s3:*"
         ],
-        "Resource": "arn:aws:s3:::${var.processed_bucket_name}/*"
+        "Resource": ["arn:aws:s3:::${var.processed_bucket_name}/*", "arn:aws:s3:::${var.ingested_bucket_name}/*"]
     }
 ]
 

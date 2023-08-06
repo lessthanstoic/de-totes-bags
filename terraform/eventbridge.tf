@@ -74,7 +74,7 @@ resource "aws_lambda_permission" "allow_trans_eventbridge" {
 # Trigger is on upload of parquet file
 #
 resource "aws_cloudwatch_event_rule" "parquet_to_s3_lambda" {
-  name        = var.cloudwatch_upload
+  name        = var.eventbridge_warehouse
   description = "Trigger transformation lambda after upload of parquet file to s3"
   event_pattern = <<EOF
   {
@@ -95,7 +95,7 @@ resource "aws_cloudwatch_event_rule" "parquet_to_s3_lambda" {
 
 resource "aws_cloudwatch_event_target" "warehouse_lambda_target" {
   rule      = aws_cloudwatch_event_rule.parquet_to_s3_lambda.name
-  target_id = "CallTransLambda"
+  target_id = "CallLoadLambda"
   arn       = "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${var.warehousing_lambda_name}"
 }
 

@@ -58,4 +58,7 @@ variable "pythonversion" {
     default = "python3.10"
 }
 
-variable "my_email_alerts" {}
+variable "my_email_alerts" {
+    type = string
+    default = "sss@ggg.com"
+}
