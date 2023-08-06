@@ -50,7 +50,7 @@ resource "aws_lambda_function" "data_transform" {
   role = aws_iam_role.iam_for_transformation_lambda.arn
   handler = "src/transformation_function.transformation_function" # pythonfilename.functionname
   runtime = var.pythonversion
-  depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
+  depends_on = [ aws_cloudwatch_log_group.transform_lambda_log, aws_iam_policy.aws_iam_policy.s3_trans_write_policy ]
 }
 
 # Lambda 2 Log Group: Creates the log group for the lambda
