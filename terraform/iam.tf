@@ -69,6 +69,7 @@ resource "aws_iam_role" "iam_for_transformation_lambda" {
 resource "aws_iam_role" "iam_for_warehousing_lambda" {
   name               = "role-${var.warehousing_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.loading_assume_role.json
+  force_detach_policies = true
 }
 
 ####################################################################################
@@ -190,6 +191,11 @@ resource "aws_iam_role_policy_attachment" "warehousing_lambda_cw_policy_attachme
 
 resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_policy_attachment" {
     role = aws_iam_role.iam_for_ingestion_lambda.name
+    policy_arn = "arn:aws:iam::170940005209:policy/get_tote_db_credentials"
+}
+
+resource "aws_iam_role_policy_attachment" "loading_lambda_secretsmanager_policy_attachment" {
+    role = aws_iam_role.iam_for_warehousing_lambda.name
     policy_arn = "arn:aws:iam::170940005209:policy/get_tote_db_credentials"
 }
 
