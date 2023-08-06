@@ -9,10 +9,7 @@ resource "aws_lambda_function" "s3_file_reader" {
   timeout = 60
   layers = [aws_lambda_layer_version.lambda_layer.arn,
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3"]
-    depends_on = [ aws_cloudwatch_log_group.ingestion_lambda_log,
-    aws_iam_policy.s3_write_policy,
-    aws_iam_role_policy_attachment.lambda_S3_write_policy_attachment,
-    aws_iam_role.iam_for_ingestion_lambda ]
+  depends_on = [ aws_cloudwatch_log_group.ingestion_lambda_log ]
 }
 
 # creates the log group for the lambda - done automatically through aws
@@ -54,9 +51,7 @@ resource "aws_lambda_function" "data_transform" {
   role = aws_iam_role.iam_for_transformation_lambda.arn
   handler = "src/transformation_function.transformation_function" # pythonfilename.functionname
   runtime = var.pythonversion
-  depends_on = [ aws_cloudwatch_log_group.transform_lambda_log, 
-  aws_iam_policy.s3_trans_write_policy,
-  aws_iam_role_policy_attachment.lambda_S3_write_policy_attachment ]
+  depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
 }
 
 # Lambda 2 Log Group: Creates the log group for the lambda
