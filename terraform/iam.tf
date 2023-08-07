@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "ingestion_cw_document" {
 
   statement {
 
-    actions = [ "logs:PutLogEvents" ]
+    actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
 
     resources = [
       # I presume this works for all lambdas now?

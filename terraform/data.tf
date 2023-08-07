@@ -14,7 +14,7 @@ data "archive_file" "ingestion_lambda" {
 
 data "archive_file" "transform_lambda" {
   type        = "zip"
-  source_dir = "${path.module}/../deployment/transformation_function"
+  source_dir = "${path.module}/../deployment/transformation_function/unzipped/fp_v3.10"
   output_path = "${path.module}/../transformation_function.zip"
 }
 

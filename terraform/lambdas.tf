@@ -32,17 +32,23 @@ resource "aws_lambda_layer_version" "psycopg2_lambda_layer" {
   compatible_runtimes = ["python3.10"]
 }
 
-resource "aws_lambda_layer_version" "fast_parquet_layer" {
-  filename   = "${path.module}/../fast_parquet_layer/python.zip"
-  layer_name = "fast_parquet_layer"
-  compatible_runtimes = ["python3.10"]
-}
+# resource "aws_lambda_layer_version" "everything_layer" {
+#   filename   = "${path.module}/../everything_layer/fastparquet.zip"
+#   layer_name = "everything"
+#   compatible_runtimes = ["python3.10"]
+# }
 
-resource "aws_lambda_layer_version" "fsspec_layer" {
-  filename   = "${path.module}/../fsspec_layer/python.zip"
-  layer_name = "fsspec_layer"
-  compatible_runtimes = ["python3.10"]
-}
+# resource "aws_lambda_layer_version" "fast_parquet_layer" {
+#   filename   = "${path.module}/../fast_parquet_layer/python.zip"
+#   layer_name = "fast_parquet_layer"
+#   compatible_runtimes = ["python3.10"]
+# }
+
+# resource "aws_lambda_layer_version" "fsspec_layer" {
+#   filename   = "${path.module}/../fsspec_layer/python.zip"
+#   layer_name = "fsspec_layer"
+#   compatible_runtimes = ["python3.10"]
+# }
 
 
 resource "aws_lambda_layer_version" "ccy_layer" {
@@ -65,9 +71,9 @@ resource "aws_lambda_function" "data_transform" {
   filename = data.archive_file.transform_lambda.output_path
   source_code_hash = data.archive_file.transform_lambda.output_base64sha256
   role = aws_iam_role.iam_for_transformation_lambda.arn
-  layers = ["arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3", aws_lambda_layer_version.fast_parquet_layer.arn, 
-  aws_lambda_layer_version.ccy_layer.arn, aws_lambda_layer_version.fsspec_layer.arn]
-  handler = "src/transformation_function.transformation_function" # pythonfilename.functionname
+  layers = [ "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3", 
+  aws_lambda_layer_version.ccy_layer.arn ]
+  handler = "transformation_function.transformation_function" # pythonfilename.functionname
   runtime = var.pythonversion
   timeout = 60
   # depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
@@ -91,8 +97,7 @@ resource "aws_lambda_function" "data_warehouse" {
   handler = "src/update_datawarehouse.push_data_in_bucket" # pythonfilename.functionname
   runtime = var.pythonversion
   layers = [aws_lambda_layer_version.psycopg2_lambda_layer.arn, 
-    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3", 
-    aws_lambda_layer_version.fast_parquet_layer.arn]
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3" ]
   # depends_on = [ aws_cloudwatch_log_group.warehouse_lambda_log ]
 }
 
