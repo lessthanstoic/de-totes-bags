@@ -55,7 +55,7 @@ def fact_sales_order_data_frame(sales_order_table):
         s3 = boto3.client('s3')
 
         file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=file_name)
+            Bucket='ingestion-data-vox-indicium', Key=file_name)
 
         # Define the column names
         # col_names = ['sales_order_id',
@@ -223,7 +223,14 @@ def create_and_push_parquet(data_frame, file_name):
     try:
         # Save DataFrame to a parquet file in memory
         parquet_buffer = io.BytesIO()
-        data_frame.to_parquet(parquet_buffer, engine='fastparquet')
+
+        orig_close = parquet_buffer.close
+        parquet_buffer.close = lambda: None
+
+        data_frame.to_parquet(parquet_buffer,
+                              engine='fastparquet',
+                              index=False)
+        parquet_buffer.close = orig_close
 
         # Connect to S3 client
         s3 = boto3.client('s3')
@@ -241,3 +248,25 @@ def create_and_push_parquet(data_frame, file_name):
     except Exception as e:
         # Generic exception for unexpected errors during conversion
         raise Exception(f"An error occurred while converting to parquet: {e}")
+
+
+def main():
+    '''
+    Runs both functions to create and transfer the final parquet file.
+    '''
+    try:
+        # Table name for the tables used in the dataframe
+        sales_order_table = 'sales_order'
+
+        # The name of the parquet file
+        fact_sales_order = "fact_sales_order"
+
+        # Call the fact_sales_order_data_frame function
+        sales_df = fact_sales_order_data_frame(sales_order_table)
+
+        # Call the create_and_push_parquet function
+        create_and_push_parquet(sales_df, fact_sales_order)
+
+    # Generic exception for unexpected errors during the function
+    except Exception as e:
+        print(f"An error occurred in the main function: {e}")

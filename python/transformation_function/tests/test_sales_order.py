@@ -12,7 +12,7 @@ def create_mock_s3():
     with mock_s3():
         s3 = boto3.client('s3', region_name='eu-west-2')
         s3.create_bucket(
-            Bucket='ingested-data-vox-indicium',
+            Bucket='ingestion-data-vox-indicium',
             CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
         s3.create_bucket(
             Bucket='processed-data-vox-indicium',
@@ -25,7 +25,7 @@ def create_mock_s3():
             "1,2022-11-03 14:20:52.186000,2022-11-03 14:20:52.186000,"
             "9,16,18,84754,2.43,3,2022-11-10,2022-11-03,4\n"
         )
-        s3.put_object(Bucket='ingested-data-vox-indicium',
+        s3.put_object(Bucket='ingestion-data-vox-indicium',
                       Key='sales_order.csv', Body=csv_data)
         yield
 
