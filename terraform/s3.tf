@@ -3,14 +3,14 @@
 # Attach policy
 # Add bucket trigger
 resource "aws_s3_bucket" "ingested_data_bucket" {
-    bucket="ingested-data-vox-indicium"
-    force_destroy = true
+    bucket="ingestion-data-vox-indicium"
+    # force_destroy = true
 }
 
 resource "aws_s3_object" "timestamp_text" {
   bucket = aws_s3_bucket.ingested_data_bucket.bucket
   key = "postgres-datetime.txt"
-  source = "../python/src/postgres-datetime.txt"
+  source = "../deployment/ingestion_function/src/postgres-datetime.txt"
 }
 
 resource "aws_s3_bucket_policy" "ingested_data_policy" {
@@ -48,6 +48,7 @@ EOF
 # Add bucket trigger
 resource "aws_s3_bucket" "processed_data_bucket" {
     bucket="processed-data-vox-indicium"
+    # force_destroy = true
 }
 
 resource "aws_s3_bucket_policy" "processed_data_policy" {
@@ -64,7 +65,7 @@ resource "aws_s3_bucket_policy" "processed_data_policy" {
         "s3:*"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.processed_data_bucket.arn}/*"
+      "Resource": ["${aws_s3_bucket.processed_data_bucket.arn}/*", "${aws_s3_bucket.processed_data_bucket.arn}"]
     }
   ]
 }

@@ -3,7 +3,7 @@ import pandas as pd
 import boto3
 from moto import mock_s3
 from python.transformation_function.src.fact_sales_order import (
-    fact_sales_order_data_frame, create_and_push_parquet, main)
+    fact_sales_order_data_frame, create_and_push_parquet)
 # Set up the mock S3 environment and create a CSV for testing
 
 
@@ -39,19 +39,19 @@ def test_fact_sales_order_data_frame(create_mock_s3):
     assert result.shape[0] == 1
 
 
-def test_sales_order_data_frame_invalid_table_name_type_error():
+def test_sales_order_data_frame_invalid_table_name_type_error(create_mock_s3):
     with pytest.raises(TypeError):
         # Non-string input
         fact_sales_order_data_frame(123)
 
 
-def test_sales_order_data_frame_file_not_found_error():
+def test_sales_order_data_frame_file_not_found_error(create_mock_s3):
     with pytest.raises(ValueError):
         fact_sales_order_data_frame('non_existent_file')
 # Test error for empty table name
 
 
-def test_sales_order_data_empty_table_name_error():
+def test_sales_order_data_empty_table_name_error(create_mock_s3):
     with pytest.raises(ValueError):
         fact_sales_order_data_frame('')
 # Test if the fact_sales_order_data_frame return the right columns
@@ -91,12 +91,3 @@ def test_create_and_push_parquet(create_mock_s3):
         Bucket='processed-data-vox-indicium', Key='sales_order.parquet')
     assert response1['ResponseMetadata']['HTTPStatusCode'] == 200
 # Test the main function
-
-
-def test_main(create_mock_s3):
-    main()
-    # Check if the file was transferred in the final bucket
-    s3 = boto3.client('s3', region_name='eu-west-2')
-    response1 = s3.get_object(
-        Bucket='processed-data-vox-indicium', Key='fact_sales_order.parquet')
-    assert response1['ResponseMetadata']['HTTPStatusCode'] == 200

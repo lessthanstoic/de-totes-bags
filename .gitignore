@@ -4,6 +4,7 @@ temp/
 **/.vscode/
 **/*_cache
 **/*pycache
+**/*pycache
 *coverage*
 # *.zip
 .terraform*
