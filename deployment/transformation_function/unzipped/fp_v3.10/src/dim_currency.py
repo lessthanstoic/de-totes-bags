@@ -43,7 +43,7 @@ def dim_currency_data_frame(table_name):
         s3 = boto3.client('s3')
 
         file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=file_name)
+            Bucket='ingestion-data-vox-indicium', Key=file_name)
 
         # Define the column names
         # col_names = ["currency_id",

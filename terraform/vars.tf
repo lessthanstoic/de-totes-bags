@@ -40,7 +40,7 @@ variable "eventbridge_warehouse" {
 #
 variable "ingested_bucket_name" {
     type = string
-    default = "ingested-data-vox-indicium"
+    default = "ingestion-data-vox-indicium"
     description = "S3 bucket name for storage of ingested data directly from database"
 }
 
@@ -60,5 +60,5 @@ variable "pythonversion" {
 
 variable "my_email_alerts" {
     type = string
-    default = "sss@ggg.com"
+    default = "mark.walsh.de-202307@northcoders.net"
 }

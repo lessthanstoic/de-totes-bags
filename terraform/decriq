@@ -1,0 +1,58 @@
+{
+    "logGroups": [
+        {
+            "logGroupName": "/aws/lambda/aws-controltower-NotificationForwarder",
+            "creationTime": 1688746649119,
+            "retentionInDays": 14,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:eu-west-2:170940005209:log-group:/aws/lambda/aws-controltower-NotificationForwarder:*",
+            "storedBytes": 0
+        },
+        {
+            "logGroupName": "/aws/lambda/ingest-sql-totes",
+            "creationTime": 1691489058105,
+            "retentionInDays": 30,
+            "metricFilterCount": 1,
+            "arn": "arn:aws:logs:eu-west-2:170940005209:log-group:/aws/lambda/ingest-sql-totes:*",
+            "storedBytes": 0
+        },
+        {
+            "logGroupName": "/aws/lambda/mistaker-test",
+            "creationTime": 1689598367001,
+            "metricFilterCount": 2,
+            "arn": "arn:aws:logs:eu-west-2:170940005209:log-group:/aws/lambda/mistaker-test:*",
+            "storedBytes": 18914040
+        },
+        {
+            "logGroupName": "/aws/lambda/parquet-to-data-warehouse",
+            "creationTime": 1691486665027,
+            "retentionInDays": 30,
+            "metricFilterCount": 1,
+            "arn": "arn:aws:logs:eu-west-2:170940005209:log-group:/aws/lambda/parquet-to-data-warehouse:*",
+            "storedBytes": 0
+        },
+        {
+            "logGroupName": "/aws/lambda/s3-file-reader-1689120942",
+            "creationTime": 1689170266574,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:eu-west-2:170940005209:log-group:/aws/lambda/s3-file-reader-1689120942:*",
+            "storedBytes": 1229
+        },
+        {
+            "logGroupName": "/aws/lambda/trans-to-star-schema",
+            "creationTime": 1691486665732,
+            "retentionInDays": 30,
+            "metricFilterCount": 1,
+            "arn": "arn:aws:logs:eu-west-2:170940005209:log-group:/aws/lambda/trans-to-star-schema:*",
+            "storedBytes": 0
+        },
+        {
+            "logGroupName": "StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-431e6353-6804-4166-ae3f-47106868cc8b-VPCFlowLogsLogGroup-fUmpEDPutarn",
+            "creationTime": 1688747002108,
+            "retentionInDays": 90,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:eu-west-2:170940005209:log-group:StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-431e6353-6804-4166-ae3f-47106868cc8b-VPCFlowLogsLogGroup-fUmpEDPutarn:*",
+            "storedBytes": 0
+        }
+    ]
+}

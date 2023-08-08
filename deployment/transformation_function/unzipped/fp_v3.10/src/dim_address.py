@@ -34,7 +34,7 @@ def dim_address_data_frame(table_name):
         s3 = boto3.client('s3')
 
         file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=file_name)
+            Bucket='ingestion-data-vox-indicium', Key=file_name)
 
         # # Define the column names
         # col_names = ["address_id",
@@ -110,7 +110,7 @@ def create_parquet(data_frame, table_name):
         data_frame.to_parquet(parquet_buffer, engine='pyarrow')
 
         s3 = boto3.client('s3')
-        s3.put_object(Bucket='ingested-data-vox-indicium',
+        s3.put_object(Bucket='ingestion-data-vox-indicium',
                       Key=f'{table_name}.parquet',
                       Body=parquet_buffer.getvalue())
 
@@ -134,7 +134,7 @@ def push_parquet_file(table_name):
 
         # Copy the parquet file
         copy_source = {
-            'Bucket': 'ingested-data-vox-indicium',
+            'Bucket': 'ingestion-data-vox-indicium',
             'Key': f'{table_name}.parquet'
         }
 
@@ -143,7 +143,7 @@ def push_parquet_file(table_name):
             f'{table_name}.parquet')
 
         # Delete the original parquet file
-        s3.delete_object(Bucket='ingested-data-vox-indicium',
+        s3.delete_object(Bucket='ingestion-data-vox-indicium',
                          Key=f'{table_name}.parquet')
 
         print(

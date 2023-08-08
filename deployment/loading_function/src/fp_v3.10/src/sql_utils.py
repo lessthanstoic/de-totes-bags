@@ -20,7 +20,7 @@ def copy_from_file(conn, df, table):
     and use copy_from() to copy it to the table
     """
     # Save the dataframe to disk
-    tmp_df = "./tmp_dataframe.csv"
+    tmp_df = "/tmp/tmp_dataframe.csv"
     df.to_csv(tmp_df, index=False, header=False)
 
     f = open(tmp_df, 'r')
@@ -75,7 +75,7 @@ def update_from_file(conn, df, table, primary_keys_list):
         logger.info("No data to copy")
         return
     elif len(df.index) == 1:
-        data_tuples = tuple(df.to_numpy()[0])
+        data_tuples = [tuple(df.to_numpy()[0])]
     else:
         data_tuples = [tuple(row) for row in df.to_numpy()]
     # get the primary keys for our table via sql query

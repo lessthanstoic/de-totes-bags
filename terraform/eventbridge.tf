@@ -56,6 +56,7 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
   bucket = var.ingested_bucket_name
+  depends_on = [ aws_s3_bucket.ingested_data_bucket ]
   lambda_function {
       lambda_function_arn = aws_lambda_function.data_transform.arn
       events              = ["s3:ObjectCreated:*"]

@@ -33,7 +33,7 @@ def dim_address_data_frame(address_table):
         s3 = boto3.client('s3')
 
         file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=file_name)
+            Bucket='ingestion-data-vox-indicium', Key=file_name)
 
         # Define the column names
         col_names = ["address_id",

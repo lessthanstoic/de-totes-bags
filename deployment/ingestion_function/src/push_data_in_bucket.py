@@ -16,7 +16,7 @@ def push_data_in_bucket(directory, file_name):
         log_changes_to_db(file_path, file_name)
         client = boto3.client("s3")
 
-        client.upload_file(file_path, "ingested-data-vox-indicium", file_name)
+        client.upload_file(file_path, "ingestion-data-vox-indicium", file_name)
 
         print(f"The file {file_name} was uploaded")
 

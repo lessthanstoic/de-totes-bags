@@ -12,6 +12,7 @@ from botocore.exceptions import ClientError
 
 import psycopg2
 import logging
+import boto3
 
 logger = logging.getLogger('MyLogger')
 logger.setLevel(logging.INFO)
@@ -20,6 +21,8 @@ logger.setLevel(logging.INFO)
 def push_data_in_bucket(event, context):
 
     bucket_name = "processed-data-vox-indicium"
+                   
+    logging.info("Started function")
 
     # Retrieve the login details from an AWS Secret Store
     try:
@@ -36,6 +39,8 @@ def push_data_in_bucket(event, context):
 
     # Use psycopg2 and credentials from the secret store to connect
     # to our data warehouse
+    logger.info("reached connection <<<<<<<<<<<<<<<<<<<")
+
     try:
         connection = psycopg2.connect(
             host=db_login_deets['host'],
@@ -53,7 +58,17 @@ def push_data_in_bucket(event, context):
     # the relevant tables
     # If it has not been called before we want to seed the
     # data warehouse with initial data (easier)
+
     if has_lambda_been_called():
+                # Connect to the S3 service
+        # logger.info("Trying to list objects")
+
+
+        # # List objects in the bucket
+
+
+        # Extract the keys (file names) of objects that end with '.parquet'
+
         pq_files = list_parquet_files_in_bucket(bucket_name)
         for file in pq_files:
             df = getDataFrameFromS3Parquet(bucket_name, file)
@@ -63,6 +78,7 @@ def push_data_in_bucket(event, context):
             logger.info('Updating Totesys warehouse...')
     else:
         pq_files = list_parquet_files_in_bucket(bucket_name)
+
         for file in pq_files:
             df = getDataFrameFromS3Parquet(bucket_name, file)
             table_name = file.split(".")[0]

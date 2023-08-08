@@ -47,11 +47,11 @@ def dim_staff_data_frame(staff_table, department_table):
         # Connect to S3 client
         s3 = boto3.client('s3')
 
-        # Get the objects from ingested-data-vox-indicium S3 bucket
+        # Get the objects from ingestion-data-vox-indicium S3 bucket
         staff_file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=staff_name)
+            Bucket='ingestion-data-vox-indicium', Key=staff_name)
         department_file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=department_name)
+            Bucket='ingestion-data-vox-indicium', Key=department_name)
 
         # Define the column names
         # staff_col_names = ['staff_id',

@@ -132,15 +132,19 @@ def list_parquet_files_in_bucket(bucket_name):
     """
     try:
         # Connect to the S3 service
+        # logger.info("Trying to list objects")
+
         s3 = boto3.client('s3')
 
         # List objects in the bucket
-        files = s3.list_objects(Bucket=bucket_name)
-        print(files)
+        files = s3.list_objects_v2(Bucket=bucket_name)
+
+        logger.info("listed and declared to variable")
 
         # Extract the keys (file names) of objects that end with '.parquet'
         return [file['Key'] for file in files['Contents']
                 if file['Key'].endswith('.parquet')]
+    
     except ClientError as e:
         logger.error("Client error", e)
 

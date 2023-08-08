@@ -42,9 +42,9 @@ def dim_design_table_data_frame(design_table):
         # Connect to S3 client
         s3 = boto3.client('s3')
 
-        # Get the objects from ingested-data-vox-indicium S3 bucket
+        # Get the objects from ingestion-data-vox-indicium S3 bucket
         file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=file_name)
+            Bucket='ingestion-data-vox-indicium', Key=file_name)
 
         # # Define the column names
         # col_names = ['design_id',

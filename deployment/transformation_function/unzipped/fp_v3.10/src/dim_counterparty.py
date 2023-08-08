@@ -48,11 +48,11 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
         # Connect to S3 client
         s3 = boto3.client('s3')
 
-        # Get the objects from ingested-data-vox-indicium S3 bucket
+        # Get the objects from ingestion-data-vox-indicium S3 bucket
         counterparty_file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=counterparty_name)
+            Bucket='ingestion-data-vox-indicium', Key=counterparty_name)
         address_file = s3.get_object(
-            Bucket='ingested-data-vox-indicium', Key=address_name)
+            Bucket='ingestion-data-vox-indicium', Key=address_name)
 
         # Define the column names
         # counterparty_col_names = ["counterparty_id",
@@ -92,7 +92,7 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
         data_frame = merged_df.rename(columns={
             'counterparty_legal_name': 'counterparty_legal_name',
             'address_line_1': 'counterparty_legal_address_line_1',
-            'address_line_2': 'counterparty_legal_address_line2',
+            'address_line_2': 'counterparty_legal_address_line_2',
             'district': 'counterparty_legal_district',
             'city': 'counterparty_legal_city',
             'postal_code': 'counterparty_legal_postal_code',
@@ -103,7 +103,7 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
         selected_columns = [
             'counterparty_id', 'counterparty_legal_name',
             'counterparty_legal_address_line_1',
-            'counterparty_legal_address_line2',
+            'counterparty_legal_address_line_2',
             'counterparty_legal_district', 'counterparty_legal_city',
             'counterparty_legal_postal_code', 'counterparty_legal_country',
             'counterparty_legal_phone_number'
@@ -117,7 +117,7 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
             "counterparty_id": "int",
             "counterparty_legal_name": "str",
             "counterparty_legal_address_line_1": "str",
-            "counterparty_legal_address_line2": "str",
+            "counterparty_legal_address_line_2": "str",
             "counterparty_legal_district": "str",
             "counterparty_legal_city": "str",
             "counterparty_legal_postal_code": "str",

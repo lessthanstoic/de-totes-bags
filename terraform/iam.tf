@@ -69,7 +69,7 @@ resource "aws_iam_role" "iam_for_transformation_lambda" {
 resource "aws_iam_role" "iam_for_warehousing_lambda" {
   name               = "role-${var.warehousing_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.loading_assume_role.json
-  force_detach_policies = true
+  # force_detach_policies = true
 }
 
 ####################################################################################
@@ -95,8 +95,8 @@ data "aws_iam_policy_document" "ingestion_cw_document" {
 
     resources = [
       # I presume this works for all lambdas now?
-      # "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.ingestion_lambda_log.name}:*"
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+      # "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.ingestion_lambda_log.name}:*"
     ]
   }
 }
@@ -119,7 +119,9 @@ data "aws_iam_policy_document" "transformation_cw_document" {
 
     resources = [
       # I presume this works for all lambdas now?
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.transform_lambda_log.name}:*"
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+
+      # "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.transform_lambda_log.name}:*"
     ]
   }
 }
@@ -142,7 +144,9 @@ data "aws_iam_policy_document" "loading_cw_document" {
 
     resources = [
       # I presume this works for all lambdas now?
-      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.warehouse_lambda_log.name}:*"
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+
+      # "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.warehouse_lambda_log.name}:*"
     ]
   }
 }
@@ -274,7 +278,27 @@ resource "aws_iam_policy" "s3_trans_write_policy" {
     EOF
     }
 
+resource "aws_iam_policy" "s3_load_read_policy" {
+  name = "s3-read-from-processed-bucket-policy"
+  description = "A policy to give load lambda permissions to read from S3 bucket"
 
+
+  policy = <<EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+    {
+        "Effect": "Allow",
+        "Action": [
+            "s3:*"
+        ],
+        "Resource": ["arn:aws:s3:::${var.processed_bucket_name}/*", "arn:aws:s3:::${var.processed_bucket_name}"]
+    }
+]
+
+}
+    EOF
+    }
 
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment" {
     role = aws_iam_role.iam_for_ingestion_lambda.name
@@ -285,4 +309,9 @@ resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment" {
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment_transformation" {
     role = aws_iam_role.iam_for_transformation_lambda.name
     policy_arn = aws_iam_policy.s3_trans_write_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_S3_read_policy_attachment_load" {
+    role = aws_iam_role.iam_for_warehousing_lambda.name
+    policy_arn = aws_iam_policy.s3_load_read_policy.arn
 }

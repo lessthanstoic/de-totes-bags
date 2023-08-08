@@ -11,7 +11,7 @@ def get_s3_timestamp(filename):
         s3 = boto3.client('s3')
 
         # get the object with the input name
-        file = s3.get_object(Bucket='ingested-data-vox-indicium', Key=filename)
+        file = s3.get_object(Bucket='ingestion-data-vox-indicium', Key=filename)
         timestamp = file['Body'].read()
         return timestamp.decode('utf-8')
     except ClientError as e:

@@ -131,11 +131,16 @@ def list_parquet_files_in_bucket(bucket_name):
         list: A list of Parquet file names present in the specified S3 bucket.
     """
     try:
+
+        logging.info("Trying to list objects")
         # Connect to the S3 service
         s3 = boto3.client('s3')
 
+        logging.info("connected to boto s3")
         # List objects in the bucket
         files = s3.list_objects(Bucket=bucket_name)
+        logger.info("listed and declared to variable")
+        logger.info(files)
 
         # Extract the keys (file names) of objects that end with '.parquet'
         return [file['Key'] for file in files['Contents']

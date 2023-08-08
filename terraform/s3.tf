@@ -3,8 +3,8 @@
 # Attach policy
 # Add bucket trigger
 resource "aws_s3_bucket" "ingested_data_bucket" {
-    bucket="ingested-data-vox-indicium"
-    force_destroy = true
+    bucket="ingestion-data-vox-indicium"
+    # force_destroy = true
 }
 
 resource "aws_s3_object" "timestamp_text" {
@@ -48,7 +48,7 @@ EOF
 # Add bucket trigger
 resource "aws_s3_bucket" "processed_data_bucket" {
     bucket="processed-data-vox-indicium"
-    force_destroy = true
+    # force_destroy = true
 }
 
 resource "aws_s3_bucket_policy" "processed_data_policy" {
@@ -65,7 +65,7 @@ resource "aws_s3_bucket_policy" "processed_data_policy" {
         "s3:*"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.processed_data_bucket.arn}/*"
+      "Resource": ["${aws_s3_bucket.processed_data_bucket.arn}/*", "${aws_s3_bucket.processed_data_bucket.arn}"]
     }
   ]
 }
