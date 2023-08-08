@@ -48,9 +48,10 @@ logger.setLevel(logging.INFO)
 
 def transformation_function(event, context):
     """
-    This function performs various data transformations and creates Parquet files
-    for different dimensions and facts. It uses several data frames from different
-    sources to generate transformed data and pushes the results to S3 buckets.
+    This function performs various data transformations and
+    creates Parquet files for different dimensions and facts.
+    It uses several data frames from different sources to generate
+    transformed data and pushes the results to S3 buckets.
 
     Parameters:
     - event (dict): The event data passed to the Lambda function.
@@ -60,7 +61,8 @@ def transformation_function(event, context):
     None
 
     Raises:
-    Exception: If an error occurs during any of the transformation or data push steps.
+    Exception: If an error occurs during any of the transformation
+    or data push steps.
     """
     try:
         currency_df = dim_currency_data_frame("currency_changes")
