@@ -1,3 +1,12 @@
+"""
+This module reads .csv files from our ingestion bucket,
+and converts them to a pandas data frame.
+This module contains three functions:
+dim_address_data_frame - reads the CSV files and returns a DataFrame.
+create_and_push_parquet - converts the DataFrame to a parquet file and
+push the parquet file in the process data bucket
+main - runs all functions to create the final parquet file.
+"""
 import boto3
 import pandas as pd
 import io
@@ -35,19 +44,6 @@ def dim_address_data_frame(table_name):
 
         file = s3.get_object(
             Bucket='ingested-data-vox-indicium', Key=file_name)
-
-        # # Define the column names
-        # col_names = ["address_id",
-        #              "address_line_1",
-        #              "address_line_2",
-        #              "district",
-        #              "city",
-        #              "postal_code",
-        #              "country",
-        #              "phone",
-        #              "created_at",
-        #              "last_updated"
-        #              ]
 
         # Read the CSV file using the column names
         data_frame = pd.read_csv(io.StringIO(

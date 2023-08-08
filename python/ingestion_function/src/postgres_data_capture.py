@@ -1,3 +1,31 @@
+"""
+This script captures data changes from a PostgreSQL database,
+writes them to CSV files, and pushes the files to an S3 bucket.
+
+The primary purpose of this script is to automate the process of
+capturing changes from a PostgreSQL database, writing them to CSV
+files, and pushing those files to an S3 bucket. This can be useful
+for logging and analyzing changes over time.
+
+This script uses various utility functions from imported modules to
+achieve its goals.
+
+Usage:
+1. Ensure the necessary libraries (psycopg2, re, botocore, logging)
+are available.
+2. Ensure that the utility functions from 'src' modules are properly
+implemented.
+3. The `postgres_data_capture` function captures data changes from the
+PostgreSQL database, writes the changes to CSV files, and pushes them
+to an S3 bucket.
+   - Provide appropriate AWS Lambda event and context arguments when
+   invoking this function.
+
+Example:
+Assuming all necessary components are in place, invoking the
+`postgres_data_capture` function can trigger the capture,
+CSV file creation, and S3 upload process.
+"""
 from src.secret_login import retrieve_secret_details
 from src.s3_timestamp import get_s3_timestamp
 from src.csv_write import write_table_to_csv
@@ -13,6 +41,18 @@ logger.setLevel(logging.INFO)
 
 
 def postgres_data_capture(event, context):
+    """
+    Capture data changes from a PostgreSQL database,
+    write to CSV files, and push to S3.
+
+    Args:
+        event: Event data passed to the function (AWS Lambda event).
+        context: Context information passedto the function
+        (AWS Lambda context).
+
+    Returns:
+        None
+    """
     try:
         param_store = "postgres-datetime.txt"
         try:
@@ -71,8 +111,9 @@ def postgres_data_capture(event, context):
 
         for table_items in table_list:
             table_name = str(table_items)
-            # replace "(" or ")" with ""
+
             if table_name != "('_prisma_migrations',)":
+                # replace "(" or ")" with ""
                 table_name = re.sub(r"[,()']", "", table_name)
 
                 table_query = f'''SELECT *
@@ -83,11 +124,10 @@ def postgres_data_capture(event, context):
                 OR last_updated
                 BETWEEN timestamp '{old_datetime}'
                 AND timestamp '{current_datetime}';'''
-                # table_query = re.sub(r"[,()']", "", table_query)
 
                 full_table_query = f'''SELECT *
                 FROM {table_name};'''
-                # full_table_query = re.sub(r"[,()']", "", full_table_query)
+                
                 try:
                     cursor.execute(table_query)
                 except Exception as e:

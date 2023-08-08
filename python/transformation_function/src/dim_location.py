@@ -1,3 +1,12 @@
+"""
+This module reads .csv files from our ingestion bucket, and converts them
+to a pandas data frame.
+This module contains four functions:
+dim_address_data_frame - reads the CSV file and returns a DataFrame.
+create_and_push_parquet - converts the DataFrame to a parquet file and push
+the parquet file in the process data bucket
+main - runs all functions to create the final parquet file.
+"""
 import boto3
 import pandas as pd
 import io

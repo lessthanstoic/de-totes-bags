@@ -1,3 +1,34 @@
+"""
+This script provides functions to interact with a PostgreSQL database
+for data loading and updating.
+
+The primary purpose of this script is to provide utility functions to
+efficiently copy data from pandas DataFrames to PostgreSQL tables using
+the COPY command and perform upsert (INSERT ON CONFLICT) operations
+for data updates. The script includes functions for copying data from both
+file and in-memory StringIO buffer. Additionally, the script includes a
+function to retrieve primary key columns of a PostgreSQL table.
+
+Functions:
+- copy_from_file: Copy data from a DataFrame to a PostgreSQL table using
+the COPY command.
+- copy_from_stringio: Copy data from a DataFrame to a PostgreSQL table using
+the COPY command and StringIO.
+- update_from_file: Update data in a PostgreSQL table from a DataFrame using
+an upsert operation.
+- get_table_primary_key: Retrieve primary key columns of a PostgreSQL table.
+
+Usage:
+1. Ensure the necessary libraries (psycopg2, io, logging) are available.
+2. Import the required utility functions from this script.
+3. Use the provided functions to copy data to PostgreSQL tables and
+perform updates.
+
+Note:
+- The functions provided in this script assume proper configuration and
+connectivity to a PostgreSQL database.
+- Error handling is provided to catch and log database-related exceptions.
+"""
 import os
 import psycopg2
 import psycopg2.extras as extras
@@ -10,14 +41,29 @@ logger.setLevel(logging.INFO)
 # With thanks to
 # https://naysan.ca/2020/05/09/
 # pandas-to-postgresql-using-psycopg2-bulk-insert-performance-benchmark/
-# for the copy_from_file and copy_from_stringio functions
+# for the copy_from_file and copy_from_stringio functions which
+# were changed to fit our needs
 
 
 def copy_from_file(conn, df, table):
     """
-    Here we are going save the dataframe on disk as
-    a csv file, load the csv file
-    and use copy_from() to copy it to the table
+    Copy data from a DataFrame to a PostgreSQL table using the COPY command.
+
+    This function saves the DataFrame to a temporary CSV file,
+    then uses the psycopg2 `copy_from` method to copy the data
+    from the CSV file into the specified PostgreSQL table.
+
+    Args:
+        conn: The PostgreSQL database connection.
+        df (pandas.DataFrame): The DataFrame containing data to be copied.
+        table (str): The name of the PostgreSQL table to copy the data into.
+
+    Returns:
+        None
+
+    Raises:
+        psycopg2.DatabaseError: If there's an error during the
+        database operation.
     """
     # Save the dataframe to disk
     tmp_df = "./tmp_dataframe.csv"
@@ -47,8 +93,24 @@ def copy_from_file(conn, df, table):
 
 def copy_from_stringio(conn, df, table):
     """
-    Here we are going save the dataframe in memory
-    and use copy_from() to copy it to the table
+    Copy data from a DataFrame to a PostgreSQL table using the
+    COPY command and StringIO.
+
+    This function saves the DataFrame to an in-memory StringIO buffer,
+    then uses the psycopg2 `copy_from` method to copy the data from
+    the buffer into the specified PostgreSQL table.
+
+    Args:
+        conn: The PostgreSQL database connection.
+        df (pandas.DataFrame): The DataFrame containing data to be copied.
+        table (str): The name of the PostgreSQL table to copy the data into.
+
+    Returns:
+        None
+
+    Raises:
+        psycopg2.DatabaseError: If there's an error during the
+        database operation.
     """
     # save dataframe to an in memory buffer
     buffer = StringIO()
@@ -69,6 +131,27 @@ def copy_from_stringio(conn, df, table):
 
 
 def update_from_file(conn, df, table, primary_keys_list):
+    """
+    Update data in a PostgreSQL table from a DataFrame.
+
+    This function updates data in a PostgreSQL table using an
+    upsert (INSERT ON CONFLICT) operation. It takes a DataFrame,
+    converts it into a list of tuples, and performs an upsert
+    using the specified primary key columns.
+
+    Args:
+        conn: The PostgreSQL database connection.
+        df (pandas.DataFrame): The DataFrame containing data to be updated.
+        table (str): The name of the PostgreSQL table to update.
+        primary_keys_list (list): List of primary key column names.
+
+    Returns:
+        None
+
+    Raises:
+        psycopg2.DatabaseError: If there's an error during the
+        database operation.
+    """
     # Convert the DataFrame into a list of tuples
     # This is essentially a tuple per row of data we wish to insert
     if len(df.index) == 0:
@@ -109,6 +192,23 @@ def update_from_file(conn, df, table, primary_keys_list):
 
 
 def get_table_primary_key(conn, table):
+    """
+    Retrieve primary key columns of a PostgreSQL table.
+
+    This function retrieves the primary key columns of a
+    PostgreSQL table using a SQL query.
+
+    Args:
+        conn: The PostgreSQL database connection.
+        table (str): The name of the PostgreSQL table.
+
+    Returns:
+        list: A list of primary key column names.
+
+    Raises:
+        psycopg2.DatabaseError: If there's an error during
+        the database operation.
+    """
     # https://wiki.postgresql.org/wiki/Retrieve_primary_key_columns
     query = f"""
         SELECT a.attname

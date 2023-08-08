@@ -57,20 +57,6 @@ def fact_sales_order_data_frame(sales_order_table):
         file = s3.get_object(
             Bucket='ingestion-data-vox-indicium', Key=file_name)
 
-        # Define the column names
-        # col_names = ['sales_order_id',
-        #              'created_at',
-        #              'last_updated',
-        #              'design_id',
-        #              'staff_id',
-        #              'counterparty_id',
-        #              'units_sold',
-        #              'unit_price',
-        #              'currency_id',
-        #              'agreed_delivery_date',
-        #              'agreed_payment_date',
-        #              'agreed_delivery_location_id']
-
         # Read the CSV file using the column names
         data_frame = pd.read_csv(io.StringIO(
             file['Body'].read().decode('utf-8')))
@@ -104,30 +90,6 @@ def fact_sales_order_data_frame(sales_order_table):
         data_frame.drop(labels=['sales_record_id'], axis=1, inplace=True)
         data_frame.insert(0, 'sales_record_id', p_key)
 
-        # Create date DataFrame
-        # unique_dates = set(data_frame['created_date'].tolist() +
-        # data_frame['last_updated_date'].tolist() +
-        # data_frame['agreed_delivery_date'].tolist() +
-        # data_frame['agreed_payment_date'].tolist())
-        # date_rows = []
-        # for unique_date in unique_dates:
-        #     date_info = pd.to_datetime(unique_date)
-        #     row = {
-        #         'date_id': unique_date,
-        #         'year': date_info.year,
-        #         'month': date_info.month,
-        #         'day': date_info.day,
-        #         'day_of_week': date_info.dayofweek,
-        #         'day_name': date_info.strftime('%A'),
-        #         'month_name': date_info.strftime('%B'),
-        #         'quarter': (date_info.month-1)//3 + 1
-        #     }
-        #     date_rows.append(row)
-
-        # date_df = pd.DataFrame(date_rows,
-        # columns=['date_id', 'year', 'month', 'day', 'day_of_week',
-        # 'day_name', 'month_name', 'quarter'])
-
         # Set the column data types for sales_order_table
         data_frame = data_frame.astype({
             'sales_record_id': 'int',
@@ -146,23 +108,6 @@ def fact_sales_order_data_frame(sales_order_table):
             'agreed_payment_date': 'str',
             'agreed_delivery_location_id': 'int'
         })
-
-        # Set the column data types for date table
-        # date_df = date_df.astype({
-        #     'date_id': 'str',
-        #     'year': 'int',
-        #     'month': 'int',
-        #     'day': 'int',
-        #     'day_of_week': 'int',
-        #     'day_name': 'str',
-        #     'month_name': 'str',
-        #     'quarter': 'int'
-        # })
-
-        # Return the final DataFrame
-        # date_df.to_csv('date.csv', index=False)
-        # data_frame.to_csv('salesss.csv', index=False)
-        # print(data_frame, date_df)
 
         data_frame = data_frame.reindex(columns=[
             'sales_record_id',
