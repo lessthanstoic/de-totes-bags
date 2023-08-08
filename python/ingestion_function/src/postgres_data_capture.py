@@ -127,7 +127,7 @@ def postgres_data_capture(event, context):
 
                 full_table_query = f'''SELECT *
                 FROM {table_name};'''
-                
+
                 try:
                     cursor.execute(table_query)
                 except Exception as e:
