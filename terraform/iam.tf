@@ -196,8 +196,32 @@ resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_policy_attachme
 
 resource "aws_iam_role_policy_attachment" "loading_lambda_secretsmanager_policy_attachment" {
     role = aws_iam_role.iam_for_warehousing_lambda.name
-    policy_arn = "arn:aws:iam::170940005209:policy/get_tote_db_credentials"
+    policy_arn = aws_iam_policy.load_secrets_manager.arn
 }
+
+resource "aws_iam_policy" "load_secrets_manager" {
+  name = "totesys_warehouse_access"
+  description = "A policy to give load lambda access to warehouse credentials"
+
+
+  policy = <<EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+    {
+        "Effect": "Allow",
+        "Action": [
+            "secretsmanager:GetSecretValue"
+        ],
+        "Resource": ["arn:aws:secretsmanager:eu-west-2:170940005209:secret:Totesys-Warehouse-4E7l1w"]
+    }
+]
+
+}
+    EOF
+    }
+
+
 
 
 ####################################################################################
@@ -249,6 +273,7 @@ resource "aws_iam_policy" "s3_trans_write_policy" {
 }
     EOF
     }
+
 
 
 resource "aws_iam_role_policy_attachment" "lambda_S3_write_policy_attachment" {

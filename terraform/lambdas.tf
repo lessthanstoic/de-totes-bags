@@ -94,8 +94,9 @@ resource "aws_lambda_function" "data_warehouse" {
   filename = data.archive_file.warehouse_lambda.output_path
   source_code_hash = data.archive_file.warehouse_lambda.output_base64sha256
   role = aws_iam_role.iam_for_warehousing_lambda.arn
-  handler = "src/update_datawarehouse.push_data_in_bucket" # pythonfilename.functionname
+  handler = "update_datawarehouse.push_data_in_bucket" # pythonfilename.functionname
   runtime = var.pythonversion
+  timeout = 60
   layers = [aws_lambda_layer_version.psycopg2_lambda_layer.arn, 
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3" ]
   # depends_on = [ aws_cloudwatch_log_group.warehouse_lambda_log ]

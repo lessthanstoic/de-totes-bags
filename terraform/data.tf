@@ -21,7 +21,7 @@ data "archive_file" "transform_lambda" {
 
 data "archive_file" "warehouse_lambda" {
   type        = "zip"
-  source_dir = "${path.module}/../deployment/loading_function"
+  source_dir = "${path.module}/../deployment/loading_function/src/fp_v3.10"
   output_path = "${path.module}/../loading_function.zip"
 }
 

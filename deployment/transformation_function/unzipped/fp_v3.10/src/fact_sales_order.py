@@ -222,8 +222,13 @@ def create_and_push_parquet(data_frame, file_name):
     '''
     try:
         # Save DataFrame to a parquet file in memory
-        # parquet_buffer = io.BytesIO()
-        pq_file = data_frame.to_parquet(engine='fastparquet')
+        parquet_buffer = io.BytesIO()
+    
+        orig_close = parquet_buffer.close
+        parquet_buffer.close = lambda: None
+
+        data_frame.to_parquet(parquet_buffer, engine='fastparquet', index=False)
+        parquet_buffer.close = orig_close
 
         # Connect to S3 client
         s3 = boto3.client('s3')
@@ -231,7 +236,7 @@ def create_and_push_parquet(data_frame, file_name):
         # Send the parquet files to processed-data-vox-indicium s3 bucket
         s3.put_object(Bucket='processed-data-vox-indicium',
                       Key=f'{file_name}.parquet',
-                      Body= pq_file)
+                      Body=parquet_buffer.getvalue())
 
         # Print a confirmation message
         logger.info(
