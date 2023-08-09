@@ -9,7 +9,7 @@ resource "aws_cloudwatch_event_rule" "every_20_minutes" {
   name        = var.eventbridge_name
   description = "Rule to trigger Lambda function every 20 minutes"
 
-  schedule_expression = "rate(1 minute)"
+  schedule_expression = "rate(10 minute)"
   
   tags = {
     Environment = "Extract"

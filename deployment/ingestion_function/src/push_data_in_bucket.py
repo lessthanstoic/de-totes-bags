@@ -34,7 +34,7 @@ def log_changes_to_db(file_path, file_name):
 
         num = len(file)
 
-        logger.error(f'Number of changes made to {file_name}: {num}')
+        logger.info(f'Number of changes made to {file_name}: {num}')
 
     except Exception as e:
         raise e
