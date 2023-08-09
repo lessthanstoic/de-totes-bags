@@ -6,12 +6,10 @@ resource "aws_s3_bucket" "ingested_data_bucket" {
     #bucket="ingested-data-vox-indicium"
     bucket=var.ingested_bucket_name
 
-    lifecycle {
-        tags = {
-        Environment = "Extract"
-        Project     = "Totesys"
-        Owner       = "Project_team_1"
-      }
+      tags = {
+      Environment = "Extract"
+      Project     = "Totesys"
+      Owner       = "Project_team_1"
     }
 }
 
