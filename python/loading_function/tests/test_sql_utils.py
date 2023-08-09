@@ -6,7 +6,7 @@ from python.loading_function.src.sql_utils import (
 from unittest import mock
 import pandas as pd
 import pytest
-from pytest import raises
+# from pytest import raises
 
 
 @mock.patch('psycopg2.connect')
@@ -32,12 +32,14 @@ def test_insert_data_from_file_returns_error(mock_connect):
     # ARRANGE
     # Mocking the database connection
     mock_conn = mock_connect.return_value
+    mock_conn.cursor.copy_from.side_effect = Exception('some db error')
 
     df = pd.read_csv("python/loading_function/tests/sales_order.csv")
 
     # ACT
     # Call the function being tested
-    copy_from_file(mock_conn, df, "sales_order")
+    with raises(Exception):
+        copy_from_file(mock_conn, df, "sales_order")
 
     # ASSERT
     # Some basic asserts we can make
