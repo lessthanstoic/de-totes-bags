@@ -1,3 +1,28 @@
+"""
+This script defines a Lambda function for performing
+a series of data transformation tasks on different data sources,
+followed by Parquet conversion and transfer. The primary purpose
+is to orchestrate the execution of various data transformation
+functions and manage the creation and transfer of Parquet files.
+The script imports transformation functions from other modules,
+applies them to specific data sources, and generates Parquet files
+based on the transformed data.
+
+Usage:
+1. Ensure the necessary libraries (boto3, pprint, logging) are available.
+2. Import the required data transformation functions from their
+respective modules.
+3. Define transformation tasks using the imported functions and
+appropriate data sources.
+4. Execute the 'transformation_function' to perform data transformation,
+Parquet conversion,
+   and S3 transfer tasks.
+
+Note:
+- This script assumes proper configuration and connectivity to Amazon S3.
+- Error handling is provided to catch and log exceptions during the
+transformation process.
+"""
 from python.transformation_function.src.dim_address import (
     dim_address_data_frame)
 from python.transformation_function.src.dim_counterparty import (
@@ -22,7 +47,23 @@ logger.setLevel(logging.INFO)
 
 
 def transformation_function(event, context):
+    """
+    This function performs various data transformations and
+    creates Parquet files for different dimensions and facts.
+    It uses several data frames from different sources to generate
+    transformed data and pushes the results to S3 buckets.
 
+    Parameters:
+    - event (dict): The event data passed to the Lambda function.
+    - context (LambdaContext): The runtime context object.
+
+    Returns:
+    None
+
+    Raises:
+    Exception: If an error occurs during any of the transformation
+    or data push steps.
+    """
     try:
         currency_df = dim_currency_data_frame("currency_changes")
         currency_parquet = create_and_push_parquet(currency_df, "dim_currency")

@@ -86,6 +86,6 @@ jobs:
 
       - name: Terraform apply
         working-directory: terraform
-        run: terraform apply -refresh-only -auto-approve
+        run: terraform apply -auto-approve
         env: 
           TF_VAR_my_email_alerts: ${{secrets.AWS_ALERT_EMAIL}}

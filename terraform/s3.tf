@@ -4,7 +4,6 @@
 # Add bucket trigger
 resource "aws_s3_bucket" "ingested_data_bucket" {
     bucket="ingested-data-vox-indicium"
-    force_destroy = true
 
     tags = {
     Environment = "Extract"
@@ -16,7 +15,7 @@ resource "aws_s3_bucket" "ingested_data_bucket" {
 resource "aws_s3_object" "timestamp_text" {
   bucket = aws_s3_bucket.ingested_data_bucket.bucket
   key = "postgres-datetime.txt"
-  source = "../python/src/postgres-datetime.txt"
+  source = "../deployment/ingestion_function/src/postgres-datetime.txt"
 }
 
 resource "aws_s3_bucket_policy" "ingested_data_policy" {
@@ -40,26 +39,19 @@ resource "aws_s3_bucket_policy" "ingested_data_policy" {
 EOF
 }
 
-# resource "aws_s3_bucket_notification" "transform_lambda_trigger" {
-#   bucket = aws_s3_bucket.ingested_data_bucket.id
-#   lambda_function {
-#     lambda_function_arn = aws_lambda_function.data_transform.arn
-#     events = ["s3:ObjectCreated:*"]
-#   }
-# }
-
 # Bucket 2: Transformed Data
 # Create s3
 # Attach policy
 # Add bucket trigger
 resource "aws_s3_bucket" "processed_data_bucket" {
-    bucket="processed-data-vox-indicium"
+  bucket="processed-data-vox-indicium"
 
-    tags = {
+  tags = {
     Environment = "Transform"
     Project     = "Totesys"
     Owner       = "Project_team_1"
   }
+
 }
 
 resource "aws_s3_bucket_policy" "processed_data_policy" {
@@ -76,7 +68,7 @@ resource "aws_s3_bucket_policy" "processed_data_policy" {
         "s3:*"
       ],
       "Effect": "Allow",
-      "Resource": "${aws_s3_bucket.processed_data_bucket.arn}/*"
+      "Resource": ["${aws_s3_bucket.processed_data_bucket.arn}/*", "${aws_s3_bucket.processed_data_bucket.arn}"]
     }
   ]
 }

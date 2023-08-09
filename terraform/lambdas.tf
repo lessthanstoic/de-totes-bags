@@ -7,8 +7,9 @@ resource "aws_lambda_function" "s3_file_reader" {
   handler = "src/postgres_data_capture.postgres_data_capture" # pythonfilename.functionname
   runtime = var.pythonversion
   timeout = 60
-  layers = [aws_lambda_layer_version.lambda_layer.arn, "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3"]
-  depends_on = [ aws_cloudwatch_log_group.ingestion_lambda_log ]
+  layers = [aws_lambda_layer_version.psycopg2_lambda_layer.arn,
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3"]
+  
   tags = {
     Environment = "Extract"
     Project     = "Totesys"
@@ -20,20 +21,19 @@ resource "aws_lambda_function" "s3_file_reader" {
 resource "aws_cloudwatch_log_group" "ingestion_lambda_log" {
   name = "/aws/lambda/${var.ingestion_lambda_name}"
   retention_in_days = 30
+
   tags = {
     Environment = "Extract"
     Project     = "Totesys"
     Owner       = "Project_team_1"
+
+  lifecycle {
+    prevent_destroy = false
   }
 }
 
-# resource "aws_cloudwatch_log_stream" "ingestion_log_stream" {
-#   name = "ingest-sql-totes"
-#   log_group_name = aws_cloudwatch_log_group.ingestion_lambda_log.name
-# }
-
-resource "aws_lambda_layer_version" "lambda_layer" {
-  filename   = "${path.module}/../layers/python.zip"
+resource "aws_lambda_layer_version" "psycopg2_lambda_layer" {
+  filename   = "${path.module}/../psycopg2_layers/python.zip"
   layer_name = "psycopg2"
   compatible_runtimes = ["python3.10"]
   tags = {
@@ -43,9 +43,10 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   }
 }
 
-resource "aws_lambda_layer_version" "fast_parquet_layer" {
-  filename   = "${path.module}/../fast_parquet_layer/python.zip"
-  layer_name = "psycopg2"
+
+resource "aws_lambda_layer_version" "ccy_layer" {
+  filename   = "${path.module}/../ccy_layer/python.zip"
+  layer_name = "ccy_layer"
   compatible_runtimes = ["python3.10"]
   tags = {
    Environment = "Extract"
@@ -53,12 +54,6 @@ resource "aws_lambda_layer_version" "fast_parquet_layer" {
     Owner       = "Project_team_1"
   }
 }
-
-# Lambda 1 Log Group: Creates the log group for the lambda
-# resource "aws_cloudwatch_log_group" "ingestion_lambda_log" {
-#   name = "aws/lambda/${var.ingestion_lambda_name}"
-#   retention_in_days = 30
-# }
 
 
 # Lambda 2: Transformation
@@ -68,10 +63,13 @@ resource "aws_lambda_function" "data_transform" {
   filename = data.archive_file.transform_lambda.output_path
   source_code_hash = data.archive_file.transform_lambda.output_base64sha256
   role = aws_iam_role.iam_for_transformation_lambda.arn
-  handler = "transform.lambda_handler" # pythonfilename.functionname
+  layers = [ "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3", 
+  aws_lambda_layer_version.ccy_layer.arn ]
+  handler = "transformation_function.transformation_function" # pythonfilename.functionname
   runtime = var.pythonversion
-  depends_on = [ aws_cloudwatch_log_group.transform_lambda_log ]
-    tags = {
+  timeout = 60
+  
+  tags = {
     Environment = "Transform"
     Project     = "Totesys"
     Owner       = "Project_team_1"
@@ -82,10 +80,15 @@ resource "aws_lambda_function" "data_transform" {
 resource "aws_cloudwatch_log_group" "transform_lambda_log" {
   name = "/aws/lambda/${var.transformation_lambda_name}"
   retention_in_days = 30
-    tags = {
+
+  tags = {
     Environment = "Transform"
     Project     = "Totesys"
     Owner       = "Project_team_1"
+
+  lifecycle {
+    prevent_destroy = false
+
   }
 }
 
@@ -95,12 +98,13 @@ resource "aws_lambda_function" "data_warehouse" {
   filename = data.archive_file.warehouse_lambda.output_path
   source_code_hash = data.archive_file.warehouse_lambda.output_base64sha256
   role = aws_iam_role.iam_for_warehousing_lambda.arn
-  handler = "warehouse.lambda_handler" # pythonfilename.functionname
+  handler = "update_datawarehouse.push_data_in_bucket" # pythonfilename.functionname
   runtime = var.pythonversion
-  layers = [aws_lambda_layer_version.lambda_layer.arn, 
-    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3", 
-    aws_lambda_layer_version.fast_parquet_layer.arn]
-  depends_on = [ aws_cloudwatch_log_group.warehouse_lambda_log ]
+  timeout = 60
+  
+  layers = [aws_lambda_layer_version.psycopg2_lambda_layer.arn, 
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python310:3" ]
+  
   tags = {
     Environment = "Load"
     Project     = "Totesys"
@@ -112,9 +116,14 @@ resource "aws_lambda_function" "data_warehouse" {
 resource "aws_cloudwatch_log_group" "warehouse_lambda_log" {
   name = "/aws/lambda/${var.warehousing_lambda_name}"
   retention_in_days = 30
+
   tags = {
     Environment = "Load"
     Project     = "Totesys"
     Owner       = "Project_team_1"
+
+  lifecycle {
+    prevent_destroy = false
+
   }
 }

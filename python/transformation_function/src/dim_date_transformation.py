@@ -1,13 +1,14 @@
+"""
+This module reads .csv files from our ingestion bucket, and converts them
+to a pandas data frame.
+This module contains four functions:
+dim_date_transformation - reads the CSV file and returns a DataFrame.
+create_and_push_parquet - converts the DataFrame to a parquet file and push
+the parquet file in the process data bucket
+main - runs all functions to create the final parquet file.
+"""
 import pandas as pd
 from datetime import datetime
-
-"""This module contains a single function - dim_date_transformation.
-
-    This function converts a passed fact_sales_order_dataframe and converts it
-    into a third normalized dim_date dataframe
-
-    Standard use: dim_date_transformation(pandas dataframe handler)
-"""
 
 
 def dim_date_transformation(dataframe):

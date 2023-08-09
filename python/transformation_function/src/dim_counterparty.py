@@ -54,27 +54,6 @@ def dim_counterparty_data_frame(counterparty_table, address_table):
         address_file = s3.get_object(
             Bucket='ingested-data-vox-indicium', Key=address_name)
 
-        # Define the column names
-        # counterparty_col_names = ["counterparty_id",
-        #                         "counterparty_legal_name",
-        #                         "legal_address_id",
-        #                         "commercial_contact",
-        #                         "delivery_contact",
-        #                         "created_at",
-        #                         "last_updated"
-        #                         ]
-        # address_col_names = ['address_id',
-        #                     'address_line_1',
-        #                     'address_line_2',
-        #                     'district',
-        #                     'city',
-        #                     'postal_code',
-        #                     'country',
-        #                     'phone',
-        #                     'created_at',
-        #                     'last_updated'
-        #                     ]
-
         # Read the CSV file using the column names
         counterparty_df = pd.read_csv(io.StringIO(
             counterparty_file['Body'].read().decode('utf-8')))
