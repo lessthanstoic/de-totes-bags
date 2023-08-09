@@ -26,6 +26,7 @@ resource "aws_cloudwatch_log_group" "ingestion_lambda_log" {
     Environment = "Extract"
     Project     = "Totesys"
     Owner       = "Project_team_1"
+  }
 
   lifecycle {
     prevent_destroy = false
@@ -85,6 +86,7 @@ resource "aws_cloudwatch_log_group" "transform_lambda_log" {
     Environment = "Transform"
     Project     = "Totesys"
     Owner       = "Project_team_1"
+  }
 
   lifecycle {
     prevent_destroy = false
@@ -121,6 +123,7 @@ resource "aws_cloudwatch_log_group" "warehouse_lambda_log" {
     Environment = "Load"
     Project     = "Totesys"
     Owner       = "Project_team_1"
+  }
 
   lifecycle {
     prevent_destroy = false
