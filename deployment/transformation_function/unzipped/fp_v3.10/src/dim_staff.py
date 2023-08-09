@@ -53,22 +53,6 @@ def dim_staff_data_frame(staff_table, department_table):
         department_file = s3.get_object(
             Bucket='ingestion-data-vox-indicium', Key=department_name)
 
-        # Define the column names
-        # staff_col_names = ['staff_id',
-        #                    'first_name',
-        #                    'last_name',
-        #                    'department_id',
-        #                    'email_address',
-        #                    'created_at timestamp',
-        #                    'last_updated']
-
-        # department_col_names = ['department_id',
-        #                         'department_name',
-        #                         'location',
-        #                         'manager',
-        #                         'created_at',
-        #                         'last_updated']
-
         # Read the CSV files using the column names
         staff_df = pd.read_csv(io.StringIO(
             staff_file['Body'].read().decode('utf-8')))
@@ -130,5 +114,3 @@ def dim_staff_data_frame(staff_table, department_table):
     except Exception as e:
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
-
-

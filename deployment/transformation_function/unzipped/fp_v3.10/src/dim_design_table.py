@@ -46,15 +46,6 @@ def dim_design_table_data_frame(design_table):
         file = s3.get_object(
             Bucket='ingestion-data-vox-indicium', Key=file_name)
 
-        # # Define the column names
-        # col_names = ['design_id',
-        #             'created_at',
-        #             'design_name',
-        #             'file_location',
-        #             'file_name',
-        #             'last_updated'
-        #             ]
-
         # Read the CSV file using the column names
         data_frame = pd.read_csv(io.StringIO(
             file['Body'].read().decode('utf-8')))
@@ -97,5 +88,3 @@ def dim_design_table_data_frame(design_table):
     except Exception as e:
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
-
-
