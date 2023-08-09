@@ -72,9 +72,12 @@ def getDataFrameFromS3Parquet(bucket_name, file_name):
         # Read the Parquet data into a DataFrame using the 'fastparquet' engine
         df = pd.read_parquet(file_like_obj, engine='fastparquet')
         return df
-
     except ClientError as e:
-        logger.error("Client error", e)
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            logger.info('No object found - returning empty')
+        elif e.response['Error']['Code'] == 'NoSuchBucket':
+            logger.info('No bucket found - returning empty')
+        raise e
 
 
 def getFileFromS3(bucket_name, file_name):
@@ -98,9 +101,11 @@ def getFileFromS3(bucket_name, file_name):
         # code of the response
         return file['Body'].read(), file['ResponseMetadata']['HTTPStatusCode']
     except ClientError as e:
-        logger.error("Client error", e)
-    except TypeError:
-        raise TypeError("Function must take a string input")
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            logger.info('No object found - returning empty')
+        elif e.response['Error']['Code'] == 'NoSuchBucket':
+            logger.info('No bucket found - returning empty')
+        raise e
 
 
 def readParquetFromBytesObject(file):
@@ -146,7 +151,11 @@ def list_parquet_files_in_bucket(bucket_name):
         return [file['Key'] for file in files['Contents']
                 if file['Key'].endswith('.parquet')]
     except ClientError as e:
-        logger.error("Client error", e)
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            logger.info('No object found - returning empty')
+        elif e.response['Error']['Code'] == 'NoSuchBucket':
+            logger.info('No bucket found - returning empty')
+        raise e
 
 
 def has_lambda_been_called():

@@ -6,6 +6,7 @@ from python.loading_function.src.sql_utils import (
 from unittest import mock
 import pandas as pd
 import pytest
+# from pytest import raises
 
 
 @mock.patch('psycopg2.connect')
@@ -13,7 +14,6 @@ def test_insert_data_from_file(mock_connect):
     # ARRANGE
     # Mocking the database connection
     mock_conn = mock_connect.return_value
-    # mock_cursor = mock_conn.cursor.return_value
 
     df = pd.read_csv("python/loading_function/tests/sales_order.csv")
 
@@ -32,7 +32,6 @@ def test_insert_data_from_file_returns_error(mock_connect):
     # ARRANGE
     # Mocking the database connection
     mock_conn = mock_connect.return_value
-    # mock_cursor = mock_conn.cursor.return_value
 
     df = pd.read_csv("python/loading_function/tests/sales_order.csv")
 
