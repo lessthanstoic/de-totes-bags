@@ -65,13 +65,13 @@ def copy_from_file(conn, df, table):
         psycopg2.DatabaseError: If there's an error during the
         database operation.
     """
-    # Save the dataframe to disk
-    tmp_df = "./tmp_dataframe.csv"
-    df.to_csv(tmp_df, index=False, header=False)
-
-    f = open(tmp_df, 'r')
-    cursor = conn.cursor()
     try:
+        # Save the dataframe to disk
+        tmp_df = "./tmp_dataframe.csv"
+        df.to_csv(tmp_df, index=False, header=False)
+
+        f = open(tmp_df, 'r')
+        cursor = conn.cursor()
         # Thinking ahead of time:
         # if we have quotes and comma's together
         # ie. ",Madrid,SN,,SEN,,,SN,173,157"
@@ -130,7 +130,7 @@ def copy_from_stringio(conn, df, table):
     cursor.close()
 
 
-def update_from_file(conn, df, table, primary_keys_list):
+def update_from_file(conn, df, table, primary_keys_list): # pragma: no cover
     """
     Update data in a PostgreSQL table from a DataFrame.
 

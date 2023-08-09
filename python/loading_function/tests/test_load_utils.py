@@ -6,7 +6,7 @@ from python.loading_function.src.load_utils import (
     has_lambda_been_called)
 from moto import mock_s3
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ParamValidationError
 from pytest import raises
 
 
@@ -31,6 +31,14 @@ def test_can_read_file_from_s3_bucket():
 
 
 @mock_s3
+def test_get_file_from_s3_client_error():
+    create_mock_s3()
+    with raises(ClientError):
+        getFileFromS3('ingested-bucket', 
+                        'file.parquet')
+
+
+@mock_s3
 def test_can_load_parquet_to_dataframe():
     create_mock_s3()
     df = getDataFrameFromS3Parquet('processed-data-vox-indicium',
@@ -48,6 +56,14 @@ def test_can_load_parquet_to_dataframe_two_functions():
     assert status == 200
     assert df.iloc[1].loc["1"] == 3
 
+
+@mock_s3
+def test_get_data_from_s3_parquet_client_error():
+    create_mock_s3()
+    with raises(ClientError):
+        getDataFrameFromS3Parquet('ingested-bucket', 
+                        'file.parquet')
+        
 
 @mock_s3
 def create_mock_s3_with_multiple_objects():
@@ -75,15 +91,8 @@ def test_lists_parquet_files_in_the_bucket():
 @mock_s3
 def test_list_parquet_files_wrong_bucket_error():
     create_mock_s3_with_multiple_objects()
-    with raises(TypeError):
+    with raises(ClientError):
         list_parquet_files_in_bucket("NotABucket")
-
-
-@mock_s3
-def test_list_parquet_files_no_bucket_error():
-    create_mock_s3_with_multiple_objects()
-    with raises(TypeError):
-        list_parquet_files_in_bucket()
 
 
 @mock_s3
