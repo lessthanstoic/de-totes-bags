@@ -44,22 +44,9 @@ def dim_address_data_frame(address_table):
         file = s3.get_object(
             Bucket='ingested-data-vox-indicium', Key=file_name)
 
-        # Define the column names
-        col_names = ["address_id",
-                     "address_line_1",
-                     "address_line_2",
-                     "district",
-                     "city",
-                     "postal_code",
-                     "country",
-                     "phone",
-                     "created_at",
-                     "last_updated"
-                     ]
-
         # Read the CSV file using the column names
         data_frame = pd.read_csv(io.StringIO(
-            file['Body'].read().decode('utf-8')), names=col_names)
+            file['Body'].read().decode('utf-8')))
 
         # Drop the original datetime columns
         data_frame = data_frame.drop(columns=['created_at', 'last_updated'])

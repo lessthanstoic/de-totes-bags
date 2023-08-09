@@ -1,3 +1,29 @@
+"""
+This script processes and loads data into a data warehouse using AWS services.
+
+The primary purpose of this script is to process and load data
+stored in Parquet files from an S3 bucket into a data warehouse
+using AWS services. The script retrieves database login details
+from AWS Secrets Manager, establishes a connection to the data warehouse
+using psycopg2, and performs either data updates or initial data seeding
+based on whether the Lambda function has been called before.
+
+Usage:
+1. Ensure the necessary libraries (psycopg2, logging, botocore) are available.
+2. Import the required utility functions from 'python.loading_function.src'
+and related modules.
+3. Use the `push_data_in_bucket` function to process and load data into
+the data warehouse.
+   - This function connects to the data warehouse using retrieved credentials
+   and loads Parquet data.
+   - Depending on whether the Lambda function has been called before,
+   it performs data updates or seeding.
+
+Example:
+Assuming AWS credentials are properly configured and AWS services are
+accessible, invoking the `push_data_in_bucket` function processes and
+loads data into the data warehouse.
+"""
 from src.load_utils import (
     getDataFrameFromS3Parquet,
     list_parquet_files_in_bucket,
@@ -12,17 +38,30 @@ from botocore.exceptions import ClientError
 
 import psycopg2
 import logging
-import boto3
 
 logger = logging.getLogger('MyLogger')
 logger.setLevel(logging.INFO)
 
 
 def push_data_in_bucket(event, context):
+    """
+    Process and load data into a data warehouse using AWS services.
 
+    This function connects to a data warehouse using database credentials
+    retrieved from AWS Secrets Manager. It processes and loads data stored
+    in Parquet files from an S3 bucket into the data warehouse. Depending
+    on whether the Lambda function has been called before, the function either
+    performs data updates or initializes the data warehouse with initial data.
+
+    Args:
+        event: Event data passed to the function (AWS Lambda event).
+        context: Context information passed to the function
+        (AWS Lambda context).
+
+    Returns:
+        None
+    """
     bucket_name = "processed-data-vox-indicium"
-                   
-    logging.info("Started function")
 
     # Retrieve the login details from an AWS Secret Store
     try:
@@ -39,8 +78,6 @@ def push_data_in_bucket(event, context):
 
     # Use psycopg2 and credentials from the secret store to connect
     # to our data warehouse
-    logger.info("reached connection <<<<<<<<<<<<<<<<<<<")
-
     try:
         connection = psycopg2.connect(
             host=db_login_deets['host'],
@@ -58,17 +95,7 @@ def push_data_in_bucket(event, context):
     # the relevant tables
     # If it has not been called before we want to seed the
     # data warehouse with initial data (easier)
-
     if has_lambda_been_called():
-                # Connect to the S3 service
-        # logger.info("Trying to list objects")
-
-
-        # # List objects in the bucket
-
-
-        # Extract the keys (file names) of objects that end with '.parquet'
-
         pq_files = list_parquet_files_in_bucket(bucket_name)
         for file in pq_files:
             df = getDataFrameFromS3Parquet(bucket_name, file)
@@ -78,7 +105,6 @@ def push_data_in_bucket(event, context):
             logger.info('Updating Totesys warehouse...')
     else:
         pq_files = list_parquet_files_in_bucket(bucket_name)
-
         for file in pq_files:
             df = getDataFrameFromS3Parquet(bucket_name, file)
             table_name = file.split(".")[0]

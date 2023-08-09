@@ -45,13 +45,6 @@ def dim_currency_data_frame(table_name):
         file = s3.get_object(
             Bucket='ingestion-data-vox-indicium', Key=file_name)
 
-        # Define the column names
-        # col_names = ["currency_id",
-        #              "currency_code",
-        #              "created_at",
-        #              "last_updated"
-        #              ]
-
         # Read the CSV file using the column names
         data_frame = pd.read_csv(io.StringIO(
             file['Body'].read().decode('utf-8')))
@@ -93,5 +86,3 @@ def dim_currency_data_frame(table_name):
     except Exception as e:
         # Generic exception to catch any other errors
         raise Exception(f"An unexpected error occurred: {e}")
-
-

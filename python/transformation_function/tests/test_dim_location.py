@@ -17,7 +17,7 @@ def create_mock_s3():
         s3.create_bucket(Bucket='processed-data-vox-indicium',
                          CreateBucketConfiguration={'LocationConstraint':
                                                     'eu-west-2'})
-        csv_data = """1,EUR,2022-11-03 14:20:51.563000,2022-11-03 14:20:51.563000\n"""  # noqa: E501
+        csv_data = """address_id,address_line_1,address_line_2,district,city,postal_code,country,phone,created_at,last_updated\n1,EUR,2022-11-03 14:20:51.563000,2022-11-03 14:20:51.563000\n"""  # noqa: E501
         s3.put_object(Bucket='ingested-data-vox-indicium',
                       Key='address.csv', Body=csv_data)
         yield

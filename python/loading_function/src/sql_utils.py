@@ -66,8 +66,7 @@ def copy_from_file(conn, df, table):
         database operation.
     """
     try:
-        # Save the dataframe to disk
-        tmp_df = "./tmp_dataframe.csv"
+        tmp_df = "/tmp/tmp_dataframe.csv"
         df.to_csv(tmp_df, index=False, header=False)
 
         f = open(tmp_df, 'r')
