@@ -49,12 +49,6 @@ resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
       events              = ["s3:ObjectCreated:*"]
       filter_suffix       = ".txt"
   }
-
-    tags = {
-    Environment = "Transform"
-    Project     = "Totesys"
-    Owner       = "Project_team_1"
-  }
 }
 
 
