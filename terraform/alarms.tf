@@ -16,7 +16,7 @@ resource "aws_cloudwatch_metric_alarm" "alert_ingestion_errors" {
   alarm_name                = "ingestion-error-alarm"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 1
-  metric_name               = "IngestionError"
+  metric_name               = aws_cloudwatch_log_metric_filter.alert_for_ingestion_error.name
   namespace                 = "ErrorLogMetrics"
   period                    = 600
   statistic                 = "Sum"
@@ -45,7 +45,7 @@ resource "aws_cloudwatch_metric_alarm" "alert_transformation_errors" {
   alarm_name                = "transformation-error-alarm"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 1
-  metric_name               = "TransformationError"
+  metric_name               = aws_cloudwatch_log_metric_filter.alert_for_transformation_error.name
   namespace                 = "ErrorLogMetrics"
   period                    = 600
   statistic                 = "Sum"
@@ -73,7 +73,7 @@ resource "aws_cloudwatch_metric_alarm" "alert_warehousing_errors" {
   alarm_name                = "warehousing-error-alarm"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 1
-  metric_name               = "WarehousingError"
+  metric_name               = aws_cloudwatch_log_metric_filter.alert_for_warehousing_error.name
   namespace                 = "ErrorLogMetrics"
   period                    = 600
   statistic                 = "Sum"
