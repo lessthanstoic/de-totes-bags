@@ -37,11 +37,6 @@ resource "aws_lambda_layer_version" "psycopg2_lambda_layer" {
   filename   = "${path.module}/../psycopg2_layers/python.zip"
   layer_name = "psycopg2"
   compatible_runtimes = ["python3.10"]
-  tags = {
-    Environment = "Extract"
-    Project     = "Totesys"
-    Owner       = "Project_team_1"
-  }
 }
 
 
@@ -49,11 +44,6 @@ resource "aws_lambda_layer_version" "ccy_layer" {
   filename   = "${path.module}/../ccy_layer/python.zip"
   layer_name = "ccy_layer"
   compatible_runtimes = ["python3.10"]
-  tags = {
-   Environment = "Extract"
-    Project     = "Totesys"
-    Owner       = "Project_team_1"
-  }
 }
 
 

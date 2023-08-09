@@ -106,11 +106,6 @@ data "aws_iam_policy_document" "ingestion_cw_document" {
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
     ]
   }
-   tags = {
-    Environment = "Extract"
-    Project     = "Totesys"
-    Owner       = "Project_team_1"
-  }
 }
 
 # Unfortunately we need another policy, even if identical
@@ -125,11 +120,6 @@ data "aws_iam_policy_document" "transformation_cw_document" {
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
     ]
   }
-    tags = {
-    Environment = "Transform"
-    Project     = "Totesys"
-    Owner       = "Project_team_1"
-  }
 }
 
 # Unfortunately we need another policy, even if identical
@@ -143,11 +133,6 @@ data "aws_iam_policy_document" "loading_cw_document" {
       # I presume this works for all lambdas now?
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
     ]
-  }
-    tags = {
-    Environment = "Load"
-    Project     = "Totesys"
-    Owner       = "Project_team_1"
   }
 }
 
