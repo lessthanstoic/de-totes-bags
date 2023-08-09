@@ -108,7 +108,7 @@ def push_data_in_bucket(event, context):
         for file in pq_files:
             df = getDataFrameFromS3Parquet(bucket_name, file)
             table_name = file.split(".")[0]
+            logger.info('Initializing Totesys warehouse:')
             copy_from_file(connection, df, table_name)
-            logger.error('Initializing Totesys warehouse:')
 
     connection.close()
