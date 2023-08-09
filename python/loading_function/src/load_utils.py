@@ -42,7 +42,7 @@ import boto3
 import io
 import os
 import logging
-from botocore.exceptions import ClientError, ParamValidationError
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger('MyLogger')
 logger.setLevel(logging.INFO)
@@ -106,7 +106,7 @@ def getFileFromS3(bucket_name, file_name):
         elif e.response['Error']['Code'] == 'NoSuchBucket':
             logger.info('No bucket found - returning empty')
         raise e
-    
+
 
 def readParquetFromBytesObject(file):
     """

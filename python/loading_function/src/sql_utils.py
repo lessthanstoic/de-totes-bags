@@ -130,7 +130,7 @@ def copy_from_stringio(conn, df, table):
     cursor.close()
 
 
-def update_from_file(conn, df, table, primary_keys_list): # pragma: no cover
+def update_from_file(conn, df, table, primary_keys_list):  # pragma: no cover
     """
     Update data in a PostgreSQL table from a DataFrame.
 

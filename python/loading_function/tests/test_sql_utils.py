@@ -6,6 +6,7 @@ from python.loading_function.src.sql_utils import (
 from unittest import mock
 import pandas as pd
 import pytest
+from pytest import raises
 
 
 @mock.patch('psycopg2.connect')
