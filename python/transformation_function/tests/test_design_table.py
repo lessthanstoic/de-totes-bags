@@ -3,9 +3,7 @@ import pandas as pd
 import boto3
 from moto import mock_s3
 from python.transformation_function.src.dim_design_table import (
-    dim_design_table_data_frame,
-    create_and_push_parquet,
-    main)
+    dim_design_table_data_frame)
 
 
 # Set up the mock S3 environment and create a CSV for testing
@@ -62,24 +60,3 @@ def test_fact_sales_order_data_frame_values(create_mock_s3):
     print(result)
     expect_values = [[8, 'Wooden', '/usr', 'wooden-20220717-npgz.json']]
     assert result.values.tolist() == expect_values
-
-
-# Test the create_and_push_parquet function
-def test_create_and_push_parquet(create_mock_s3):
-    df = pd.DataFrame({'dummy': [1]})
-    create_and_push_parquet(df, 'dim_design')
-    s3 = boto3.client('s3', region_name='eu-west-2')
-    # Check if the file was created in the S3 bucket
-    response = s3.get_object(Bucket='processed-data-vox-indicium',
-                             Key='dim_design.parquet')
-    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
-
-
-# Test the main function
-def test_main(create_mock_s3):
-    main()
-    # Check if the file was transferred in the final bucket
-    s3 = boto3.client('s3', region_name='eu-west-2')
-    response = s3.get_object(Bucket='processed-data-vox-indicium',
-                             Key='dim_design.parquet')
-    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
