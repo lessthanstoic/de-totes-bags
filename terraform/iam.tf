@@ -51,6 +51,13 @@ resource "aws_iam_role" "iam_for_ingestion_lambda" {
   name               = "role-${var.ingestion_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.ingestion_assume_role.json
   force_detach_policies = true
+  
+  tags = {
+    Environment = "Extract"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
+
+  }
 }
 
 
@@ -60,6 +67,11 @@ resource "aws_iam_role" "iam_for_ingestion_lambda" {
 resource "aws_iam_role" "iam_for_transformation_lambda" {
   name               = "role-${var.transformation_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.transformation_assume_role.json
+  tags = {
+    Environment = "Transform"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
+  }
 }
 
 
@@ -69,7 +81,12 @@ resource "aws_iam_role" "iam_for_transformation_lambda" {
 resource "aws_iam_role" "iam_for_warehousing_lambda" {
   name               = "role-${var.warehousing_lambda_name}"
   assume_role_policy = data.aws_iam_policy_document.loading_assume_role.json
-  # force_detach_policies = true
+
+  tags = {
+    Environment = "Load"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
+  }
 }
 
 ####################################################################################
@@ -80,15 +97,6 @@ resource "aws_iam_role" "iam_for_warehousing_lambda" {
 # cloudwatch policy (defines the permissions to be attributed to a role) 
 # which allows the creation and "put" to the logs
 data "aws_iam_policy_document" "ingestion_cw_document" {
-  # statement {
-
-  #   actions = [ "logs:CreateLogGroup" ]
-
-  #   resources = [
-  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.ingestion_lambda_log.name}:*"
-  #   ]
-  # }
-
   statement {
 
     actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
@@ -96,23 +104,18 @@ data "aws_iam_policy_document" "ingestion_cw_document" {
     resources = [
       # I presume this works for all lambdas now?
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-      # "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.ingestion_lambda_log.name}:*"
     ]
+  }
+   tags = {
+    Environment = "Extract"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
   }
 }
 
 # Unfortunately we need another policy, even if identical
 # https://github.com/hashicorp/terraform/issues/11873
 data "aws_iam_policy_document" "transformation_cw_document" {
-  # statement {
-
-  #   actions = [ "logs:CreateLogGroup" ]
-
-  #   resources = [
-  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-  #   ]
-  # }
-
   statement {
 
     actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
@@ -120,24 +123,18 @@ data "aws_iam_policy_document" "transformation_cw_document" {
     resources = [
       # I presume this works for all lambdas now?
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-
-      # "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.transform_lambda_log.name}:*"
     ]
+  }
+    tags = {
+    Environment = "Transform"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
   }
 }
 
 # Unfortunately we need another policy, even if identical
 # https://github.com/hashicorp/terraform/issues/11873
 data "aws_iam_policy_document" "loading_cw_document" {
-  # statement {
-
-  #   actions = [ "logs:CreateLogGroup" ]
-
-  #   resources = [
-  #     "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-  #   ]
-  # }
-
   statement {
 
     actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
@@ -145,9 +142,12 @@ data "aws_iam_policy_document" "loading_cw_document" {
     resources = [
       # I presume this works for all lambdas now?
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-
-      # "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.warehouse_lambda_log.name}:*"
     ]
+  }
+    tags = {
+    Environment = "Load"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
   }
 }
 
@@ -253,6 +253,11 @@ resource "aws_iam_policy" "s3_write_policy" {
 
 }
     EOF
+      tags = {
+      Environment = "Extract"
+      Project     = "Totesys"
+      Owner       = "Project_team_1"
+    }
     }
 
 
