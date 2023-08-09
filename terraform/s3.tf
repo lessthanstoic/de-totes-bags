@@ -3,13 +3,16 @@
 # Attach policy
 # Add bucket trigger
 resource "aws_s3_bucket" "ingested_data_bucket" {
-    bucket="ingested-data-vox-indicium"
+    #bucket="ingested-data-vox-indicium"
+    bucket=var.ingested_bucket_name
 
-    tags = {
-    Environment = "Extract"
-    Project     = "Totesys"
-    Owner       = "Project_team_1"
-  }
+    lifecycle {
+        tags = {
+        Environment = "Extract"
+        Project     = "Totesys"
+        Owner       = "Project_team_1"
+      }
+    }
 }
 
 resource "aws_s3_object" "timestamp_text" {
@@ -44,7 +47,8 @@ EOF
 # Attach policy
 # Add bucket trigger
 resource "aws_s3_bucket" "processed_data_bucket" {
-  bucket="processed-data-vox-indicium"
+  #bucket="processed-data-vox-indicium"
+  bucket=var.processed_bucket_name
 
   tags = {
     Environment = "Transform"
