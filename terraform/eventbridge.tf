@@ -9,6 +9,11 @@ resource "aws_cloudwatch_event_rule" "every_20_minutes" {
   name        = var.eventbridge_name
   description = "Rule to trigger Lambda function every 20 minutes"
   schedule_expression = "rate(20 minutes)"
+  tags = {
+    Environment = "Extract"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
+  }
 }
 
 
@@ -51,6 +56,11 @@ resource "aws_cloudwatch_event_rule" "txtfile_to_s3_lambda" {
     }
   }
   EOF
+    tags = {
+    Environment = "Transform"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
+  }
 }
 
 
@@ -90,6 +100,11 @@ resource "aws_cloudwatch_event_rule" "parquet_to_s3_lambda" {
     }
   }
   EOF
+    tags = {
+    Environment = "Load"
+    Project     = "Totesys"
+    Owner       = "Project_team_1"
+  }
 }
 
 
