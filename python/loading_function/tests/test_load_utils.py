@@ -6,6 +6,8 @@ from python.loading_function.src.load_utils import (
     has_lambda_been_called)
 from moto import mock_s3
 import boto3
+from botocore.exceptions import ClientError
+from pytest import raises
 
 
 @mock_s3
@@ -68,6 +70,20 @@ def test_lists_parquet_files_in_the_bucket():
     create_mock_s3_with_multiple_objects()
     obj = list_parquet_files_in_bucket('processed-data-vox-indicium')
     assert obj == ['fact_sales.parquet']
+
+
+@mock_s3
+def test_list_parquet_files_wrong_bucket_error():
+    create_mock_s3_with_multiple_objects()
+    with raises(TypeError):
+        list_parquet_files_in_bucket("NotABucket")
+
+
+@mock_s3
+def test_list_parquet_files_no_bucket_error():
+    create_mock_s3_with_multiple_objects()
+    with raises(TypeError):
+        list_parquet_files_in_bucket()
 
 
 @mock_s3

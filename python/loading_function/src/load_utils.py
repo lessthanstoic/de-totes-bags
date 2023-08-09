@@ -147,6 +147,10 @@ def list_parquet_files_in_bucket(bucket_name):
                 if file['Key'].endswith('.parquet')]
     except ClientError as e:
         logger.error("Client error", e)
+    except TypeError as te:
+        logger.info('''Error: Bucket does not exist - gives TypeError''')
+        raise TypeError('''Function must take a string input
+                         and an existing bucket''')
 
 
 def has_lambda_been_called():
