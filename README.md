@@ -16,9 +16,12 @@ The project is delivers the following:
 3) A "Transformation" Python application (AWS Lambda) that remodels the data into a predefined schema suitable for a data warehouse and stores the data in `parquet` format in the "processed" S3 bucket. 
     The application:
       - triggers automatically when it detects the completion of an ingested data job
-      - is adequately logged and monitored
+      - is logged and monitored
       - populates the dimension and fact tables of a single "star" schema in the warehouse
-4) A "Load" Python application (AWS Lambda) that loads the data into a prepared data warehouse. This is triggered via completion of the "Transformation" Lambda finishing writing the files to the "processed" S3 bucket. The application is logged and monitored.
+4) A "Load" Python application (AWS Lambda) that loads the data into a prepared data warehouse. The application:
+      - is triggered via completion of the "Transformation" Lambda finishing writing the files to the "processed" S3 bucket
+      - is logged and monitored
+      - follows good security practices (for example, preventing SQL injection and maintaining password security)
 5) Business insights were generated via a Quicksight dashboard that allows users to view useful data in the warehouse
 
 ## Project Development
