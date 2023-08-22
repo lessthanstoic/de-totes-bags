@@ -13,7 +13,7 @@ The project is delivers the following:
       - operates automatically on an easy to change schedule
       - logs progress to Cloudwatch
       - trigger email alerts in the event of failures
-  - follows good security practices (for example, preventing SQL injection and maintaining password security)
+      - follows good security practices (for example, preventing SQL injection and maintaining password security)
 3) A "Transformation" Python application (AWS Lambda) that remodels the data into a predefined schema suitable for a data warehouse and stores the data in `parquet` format in the "processed" S3 bucket. 
     The application:
       - triggers automatically when it detects the completion of an ingested data job
