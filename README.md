@@ -8,8 +8,7 @@ Changes to the database are reflected in the data warehouse is under 30 minutes.
 
 The project is delivers the following:
 1) Two S3 buckets (one for ingested data and one for processed data)
-2) An "Extraction" Python application (deployed in an AWS Lambda) that continually ingests all tables from the business database. The data is saved in files in the "ingestion" S3 bucket in a CSV format.
-   The ingestion application:
+2) An "Extraction" Python application (deployed in an AWS Lambda) that continually ingests all tables from the business database. The data is saved in files in the "ingestion" S3 bucket in a CSV format. The ingestion application:
       - operates automatically on an easy to change schedule
       - logs progress to Cloudwatch
       - trigger email alerts in the event of failures
