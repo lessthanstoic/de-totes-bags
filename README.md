@@ -2,7 +2,7 @@
 
 ## Data Engineering: Totes Bags Company
 
-This project showcases a finished Extract Transform Load (ETL) pipeline containing using AWS lambda's, AWS S3 buckets and python.
+This project showcases a finished Extract Transform Load (ETL) pipeline using AWS lambda's, AWS S3 buckets and python.
 The data platform extracts data from an operational database, archives it in a data lake, and makes it availabale in a remodelled online analytical processing (OLAP) data warehouse.
 Changes to the database are reflected in the data warehouse is under 30 minutes.
 
