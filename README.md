@@ -4,7 +4,7 @@
 
 This project showcases a finished Extract Transform Load (ETL) pipeline using AWS lambda's, AWS S3 buckets and python.
 The data platform extracts data from an operational database, archives it in a data lake, and makes it available in a remodelled online analytical processing (OLAP) data warehouse.
-Changes to the database are reflected in the data warehouse is under 30 minutes.
+Changes to the database are reflected in the data warehouse in under 30 minutes.
 
 The project is delivers the following:
 1) Two S3 buckets (one for ingested data and one for processed data)
